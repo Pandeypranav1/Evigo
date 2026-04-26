@@ -91,12 +91,18 @@ export function Header() {
         .evigo-inner {
           max-width: 1280px;
           margin: 0 auto;
-          padding: 0 24px;
-          height: 64px;
+          padding: 0 16px;
+          height: 56px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 12px;
+        }
+        @media (min-width: 640px) {
+          .evigo-inner {
+            padding: 0 24px;
+            height: 64px;
+          }
         }
         .evigo-logo {
           font-size: 22px;
@@ -201,9 +207,13 @@ export function Header() {
         .evigo-mobile-menu {
           display: none;
           flex-direction: column;
-          padding: 14px 20px 18px;
+          padding: 14px 16px 18px;
           border-top: 1px solid rgba(255,255,255,0.06);
           gap: 10px;
+          background: linear-gradient(135deg,
+            rgba(5,3,15,0.99) 0%,
+            rgba(35,10,70,0.99) 50%,
+            rgba(5,20,60,0.99) 100%);
         }
         .evigo-mobile-link {
           font-size: 15px;

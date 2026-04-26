@@ -1,6 +1,18 @@
 import type { ReactNode } from "react";
 
 export function Container({ children }: { children: ReactNode }) {
-  return <div style={{ width: "90%", maxWidth: 1600, margin: "0 auto", padding: "0 20px" }}>{children}</div>;
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: 1280,
+        margin: "0 auto",
+        paddingLeft: 16,
+        paddingRight: 16,
+        boxSizing: "border-box",
+      }}
+    >
+      {children}
+    </div>
+  );
 }
-

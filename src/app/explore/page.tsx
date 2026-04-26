@@ -53,42 +53,43 @@ function BookingModal({
 
   return (
     <div
-      style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)", zIndex:60, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div style={{ background:"#fff", borderRadius:24, padding:"32px 28px", width:"100%", maxWidth:460, boxShadow:"0 32px 80px rgba(0,0,0,0.25)" }}>
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 w-full max-w-[460px]" style={{ boxShadow: "0 32px 80px rgba(0,0,0,0.25)" }}>
         {done ? (
           <div className="text-center py-2">
-            <div style={{ fontSize:52 }}>✅</div>
-            <div style={{ fontSize:18, fontWeight:900, color:"#18181b", marginTop:12 }}>Booking Requested!</div>
-            <div style={{ fontSize:14, color:"#71717a", marginTop:6 }}>
+            <div className="text-5xl">✅</div>
+            <div className="text-lg font-black text-zinc-900 mt-3">Booking Requested!</div>
+            <div className="text-sm text-zinc-500 mt-1.5">
               Your request has been sent to <strong>{provider.businessName}</strong>.
             </div>
-            <button onClick={onClose} style={{ marginTop:20, width:"100%", padding:"11px 0", borderRadius:12, background:"linear-gradient(135deg,#8b5cf6,#06b6d4)", border:"none", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+            <button onClick={onClose} className="mt-5 w-full py-3 rounded-xl text-sm font-bold text-white cursor-pointer" style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", border: "none" }}>
               Close
             </button>
           </div>
         ) : (
           <>
-            <div style={{ fontSize:17, fontWeight:900, color:"#18181b" }}>Book {provider.businessName}</div>
-            <div style={{ fontSize:13, color:"#71717a", marginTop:2, marginBottom:20 }}>{provider.category} · {provider.city}</div>
-            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-              <label style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                <span style={{ fontSize:12, fontWeight:700, color:"#52525b", textTransform:"uppercase", letterSpacing:"0.05em" }}>Event Date</span>
-                <input type="date" value={eventDate} onChange={e=>setEventDate(e.target.value)} style={{ padding:"10px 14px", borderRadius:10, border:"1px solid #e4e4e7", fontSize:14, outline:"none" }} />
+            <div className="text-base sm:text-lg font-black text-zinc-900">Book {provider.businessName}</div>
+            <div className="text-xs sm:text-[13px] text-zinc-500 mt-0.5 mb-5">{provider.category} · {provider.city}</div>
+            <div className="flex flex-col gap-3.5">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Event Date</span>
+                <input type="date" value={eventDate} onChange={e=>setEventDate(e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-sm outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100" />
               </label>
-              <label style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                <span style={{ fontSize:12, fontWeight:700, color:"#52525b", textTransform:"uppercase", letterSpacing:"0.05em" }}>Venue / Location</span>
-                <input value={location} onChange={e=>setLocation(e.target.value)} placeholder="e.g. Wedding Hall, Patna" style={{ padding:"10px 14px", borderRadius:10, border:"1px solid #e4e4e7", fontSize:14, outline:"none" }} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Venue / Location</span>
+                <input value={location} onChange={e=>setLocation(e.target.value)} placeholder="e.g. Wedding Hall, Patna" className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-sm outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100" />
               </label>
-              <label style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                <span style={{ fontSize:12, fontWeight:700, color:"#52525b", textTransform:"uppercase", letterSpacing:"0.05em" }}>Notes (optional)</span>
-                <textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={3} placeholder="Any special requirements..." style={{ padding:"10px 14px", borderRadius:10, border:"1px solid #e4e4e7", fontSize:14, outline:"none", resize:"none" }} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Notes (optional)</span>
+                <textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={3} placeholder="Any special requirements..." className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 text-sm outline-none resize-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100" />
               </label>
             </div>
-            <div style={{ display:"flex", gap:10, marginTop:22 }}>
-              <button onClick={onClose} style={{ flex:1, padding:"11px 0", borderRadius:12, border:"1px solid #e4e4e7", background:"#fff", fontSize:14, fontWeight:700, color:"#3f3f46", cursor:"pointer" }}>Cancel</button>
-              <button onClick={confirm} disabled={!eventDate||!location} style={{ flex:1, padding:"11px 0", borderRadius:12, border:"none", background:"linear-gradient(135deg,#8b5cf6,#06b6d4)", fontSize:14, fontWeight:700, color:"#fff", cursor:"pointer", opacity:(!eventDate||!location)?0.45:1 }}>
+            <div className="flex gap-3 mt-5">
+              <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm font-bold text-zinc-600 cursor-pointer">Cancel</button>
+              <button onClick={confirm} disabled={!eventDate||!location} className="flex-1 py-2.5 rounded-xl border-none text-sm font-bold text-white cursor-pointer" style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", opacity:(!eventDate||!location)?0.45:1 }}>
                 Confirm Booking
               </button>
             </div>
@@ -106,50 +107,44 @@ function ProviderCard({ provider, onBook }: { provider: DemoProvider; onBook: (p
 
   return (
     <div
-      style={{ background:"#fff", borderRadius:20, border:"1px solid #e4e4e7", overflow:"hidden", transition:"transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease" }}
-      onMouseEnter={(e) => { const el=e.currentTarget as HTMLDivElement; el.style.transform="translateY(-6px)"; el.style.boxShadow="0 20px 48px rgba(139,92,246,0.15)"; el.style.borderColor="#c4b5fd"; }}
-      onMouseLeave={(e) => { const el=e.currentTarget as HTMLDivElement; el.style.transform="translateY(0)"; el.style.boxShadow="none"; el.style.borderColor="#e4e4e7"; }}
+      className="bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_48px_rgba(139,92,246,0.15)] hover:border-purple-300"
     >
       {/* Image */}
-      <div style={{ position:"relative", aspectRatio:"16/10", overflow:"hidden", background:"#f4f4f5" }}>
-        <Image src={imgSrc} alt={provider.businessName} fill className="object-cover" style={{ transition:"transform 0.5s ease" }}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100">
+        <Image src={imgSrc} alt={provider.businessName} fill className="object-cover transition-transform duration-500 hover:scale-105"
+          sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
           onError={() => setImgError(true)}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLImageElement).style.transform="scale(1.06)")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLImageElement).style.transform="scale(1)")}
         />
         {/* gradient */}
-        <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)" }} />
         {/* category pill */}
-        <div style={{ position:"absolute", top:12, left:12 }}>
-          <span style={{ background:"rgba(255,255,255,0.92)", backdropFilter:"blur(8px)", borderRadius:99, padding:"3px 10px", fontSize:11, fontWeight:700, color:"#3f3f46" }}>{provider.category}</span>
+        <div className="absolute top-3 left-3">
+          <span className="bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-[11px] font-bold text-zinc-600">{provider.category}</span>
         </div>
       </div>
 
       {/* Body */}
-      <div style={{ padding:"16px 18px 18px" }}>
-        <div style={{ fontSize:15, fontWeight:900, color:"#18181b" }}>{provider.businessName}</div>
-        <div style={{ fontSize:12, fontWeight:600, color:"#71717a", marginTop:2 }}>{provider.ownerName}</div>
-        <div style={{ display:"flex", alignItems:"center", gap:12, marginTop:10, fontSize:12, fontWeight:700, color:"#52525b" }}>
+      <div className="p-4">
+        <div className="text-[15px] font-black text-zinc-900">{provider.businessName}</div>
+        <div className="text-xs font-semibold text-zinc-500 mt-0.5">{provider.ownerName}</div>
+        <div className="flex items-center gap-3 mt-2.5 text-xs font-bold text-zinc-500">
           <span>📍 {provider.city}</span>
           {provider.experienceYears>0 && <span>⭐ {provider.experienceYears} yrs</span>}
         </div>
-        <div style={{ marginTop:8, fontSize:15, fontWeight:900, background:"linear-gradient(135deg,#7c3aed,#0891b2)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+        <div className="mt-2 text-[15px] font-black grad-text">
           ₹{provider.startingPrice.toLocaleString("en-IN")}+
         </div>
         {provider.description && (
-          <div style={{ marginTop:8, fontSize:12, color:"#71717a", lineHeight:1.6, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
+          <div className="mt-2 text-xs text-zinc-500 leading-relaxed line-clamp-2">
             {provider.description}
           </div>
         )}
-        <div style={{ display:"flex", gap:8, marginTop:14 }}>
-          <button onClick={() => onBook(provider)} style={{ flex:1, padding:"9px 0", borderRadius:10, border:"none", background:"linear-gradient(135deg,#8b5cf6,#06b6d4)", fontSize:13, fontWeight:700, color:"#fff", cursor:"pointer", boxShadow:"0 2px 10px rgba(139,92,246,0.3)", transition:"opacity 0.15s" }}
-            onMouseEnter={e=>(e.currentTarget.style.opacity="0.88")} onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
+        <div className="flex gap-2 mt-3.5">
+          <button onClick={() => onBook(provider)} className="flex-1 py-2.5 rounded-xl border-none text-[13px] font-bold text-white cursor-pointer transition-opacity hover:opacity-90" style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", boxShadow: "0 2px 10px rgba(139,92,246,0.3)" }}>
             Book Now
           </button>
           {provider.phone && (
-            <a href={`tel:${provider.phone}`} style={{ flex:1, padding:"9px 0", borderRadius:10, border:"1px solid #e4e4e7", background:"#fff", fontSize:13, fontWeight:700, color:"#3f3f46", textDecoration:"none", textAlign:"center", transition:"background 0.15s" }}
-              onMouseEnter={e=>(e.currentTarget.style.background="#f4f4f5")} onMouseLeave={e=>(e.currentTarget.style.background="#fff")}>
+            <a href={`tel:${provider.phone}`} className="flex-1 py-2.5 rounded-xl border border-zinc-200 bg-white text-[13px] font-bold text-zinc-600 no-underline text-center transition-colors hover:bg-zinc-50">
               📞 Call
             </a>
           )}
@@ -162,20 +157,18 @@ function ProviderCard({ provider, onBook }: { provider: DemoProvider; onBook: (p
 /* ─── Empty State ─── */
 function EmptyState({ category }: { category: string }) {
   return (
-    <div style={{ textAlign:"center", padding:"72px 24px" }}>
-      <div style={{ width:96, height:96, borderRadius:"50%", background:"linear-gradient(135deg,#ede9fe,#cffafe)", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:44 }}>
+    <div className="text-center py-12 sm:py-18 px-4">
+      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-4xl sm:text-5xl" style={{ background: "linear-gradient(135deg,#ede9fe,#cffafe)" }}>
         🔍
       </div>
-      <div style={{ fontSize:22, fontWeight:900, color:"#18181b" }}>No providers yet</div>
-      <div style={{ fontSize:14, color:"#71717a", maxWidth:320, margin:"10px auto 0", lineHeight:1.7 }}>
+      <div className="text-xl sm:text-2xl font-black text-zinc-900">No providers yet</div>
+      <div className="text-sm text-zinc-500 max-w-xs mx-auto mt-2.5 leading-relaxed">
         {category !== "All"
           ? `No ${category} providers have listed yet. Be the first to register!`
           : "Be the first to list your service on Evigo and reach thousands of clients."}
       </div>
       <Link href="/partner">
-        <button style={{ marginTop:28, padding:"12px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#8b5cf6,#06b6d4)", fontSize:14, fontWeight:700, color:"#fff", cursor:"pointer", boxShadow:"0 4px 20px rgba(139,92,246,0.35)", transition:"transform 0.15s, box-shadow 0.15s" }}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 8px 28px rgba(139,92,246,0.5)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 20px rgba(139,92,246,0.35)";}}>
+        <button className="mt-7 px-7 py-3 rounded-xl border-none text-sm font-bold text-white cursor-pointer transition-all duration-200 hover:-translate-y-0.5" style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", boxShadow: "0 4px 20px rgba(139,92,246,0.35)" }}>
           Become a Partner →
         </button>
       </Link>
@@ -209,20 +202,20 @@ export default function ExplorePage() {
   }, [providers, category, locationFilter, priceBand]);
 
   return (
-    <main style={{ flex:1, paddingBottom:80 }}>
+    <main className="flex-1 pb-16 sm:pb-20">
       {/* ── Hero header ── */}
-      <div style={{ background:"linear-gradient(180deg,#faf5ff 0%,#f0f9ff 50%,#fff 100%)", borderBottom:"1px solid #f0f0f0", padding:"52px 0 40px" }}>
+      <div className="border-b border-zinc-100 py-10 sm:py-14" style={{ background: "linear-gradient(180deg,#faf5ff 0%,#f0f9ff 50%,#fff 100%)" }}>
         <Container>
-          <div style={{ textAlign:"center" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(139,92,246,0.08)", border:"1px solid rgba(139,92,246,0.2)", borderRadius:99, padding:"5px 16px", marginBottom:18, fontSize:13, fontWeight:700, color:"#7c3aed" }}>
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1 mb-4 sm:mb-5 text-xs sm:text-[13px] font-bold text-violet-700" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)" }}>
               ✦ Real listings · No fake vendors
             </div>
-            <h1 style={{ fontSize:42, fontWeight:900, lineHeight:1.15, margin:0 }}>
-              <span style={{ background:"linear-gradient(135deg,#8b5cf6,#06b6d4)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+            <h1 className="text-3xl sm:text-4xl md:text-[42px] font-black leading-tight">
+              <span className="grad-text">
                 Explore Providers
               </span>
             </h1>
-            <p style={{ fontSize:15, color:"#71717a", marginTop:12, maxWidth:460, margin:"12px auto 0", lineHeight:1.7 }}>
+            <p className="text-sm sm:text-[15px] text-zinc-500 mt-3 max-w-md mx-auto leading-relaxed">
               Browse verified event professionals across Bihar. Real people, real services.
             </p>
           </div>
@@ -231,46 +224,47 @@ export default function ExplorePage() {
 
       <Container>
         {/* ── Filter bar ── */}
-        <div style={{ margin:"28px 0", background:"#fff", borderRadius:16, border:"1px solid #e4e4e7", padding:"16px 20px", display:"flex", flexWrap:"wrap", gap:14, alignItems:"center", boxShadow:"0 2px 16px rgba(0,0,0,0.05)" }}>
+        <div className="my-6 sm:my-7 bg-white rounded-2xl border border-zinc-200 p-4 sm:p-5 flex flex-wrap gap-3 sm:gap-4 items-end" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.05)" }}>
           {/* Service type */}
-          <div style={{ display:"flex", flexDirection:"column", gap:4, flex:"1 1 160px", minWidth:140 }}>
-            <label style={{ fontSize:11, fontWeight:700, color:"#71717a", textTransform:"uppercase", letterSpacing:"0.06em" }}>Service Type</label>
+          <div className="flex flex-col gap-1 flex-1 min-w-[130px]">
+            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Service Type</label>
             <select value={category} onChange={e => setCategory(e.target.value as ServiceCategory | "All")}
-              style={{ padding:"8px 12px", borderRadius:10, border:"1px solid #e4e4e7", fontSize:13, fontWeight:600, color:"#18181b", outline:"none", background:"#fafafa", cursor:"pointer" }}>
+              className="px-3 py-2 rounded-xl border border-zinc-200 text-[13px] font-semibold text-zinc-900 outline-none bg-zinc-50 cursor-pointer">
               <option value="All">All Services</option>
               {SERVICE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
 
           {/* Location */}
-          <div style={{ display:"flex", flexDirection:"column", gap:4, flex:"1 1 160px", minWidth:140 }}>
-            <label style={{ fontSize:11, fontWeight:700, color:"#71717a", textTransform:"uppercase", letterSpacing:"0.06em" }}>Location</label>
+          <div className="flex flex-col gap-1 flex-1 min-w-[130px]">
+            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Location</label>
             <input value={locationFilter} onChange={e => setLocationFilter(e.target.value)} placeholder="City, e.g. Patna"
-              style={{ padding:"8px 12px", borderRadius:10, border:"1px solid #e4e4e7", fontSize:13, fontWeight:600, color:"#18181b", outline:"none", background:"#fafafa" }} />
+              className="px-3 py-2 rounded-xl border border-zinc-200 text-[13px] font-semibold text-zinc-900 outline-none bg-zinc-50" />
           </div>
 
           {/* Price */}
-          <div style={{ display:"flex", flexDirection:"column", gap:4, flex:"1 1 160px", minWidth:160 }}>
-            <label style={{ fontSize:11, fontWeight:700, color:"#71717a", textTransform:"uppercase", letterSpacing:"0.06em" }}>Price Range</label>
+          <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
+            <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Price Range</label>
             <select value={priceBand} onChange={e => setPriceBand(Number(e.target.value))}
-              style={{ padding:"8px 12px", borderRadius:10, border:"1px solid #e4e4e7", fontSize:13, fontWeight:600, color:"#18181b", outline:"none", background:"#fafafa", cursor:"pointer" }}>
+              className="px-3 py-2 rounded-xl border border-zinc-200 text-[13px] font-semibold text-zinc-900 outline-none bg-zinc-50 cursor-pointer">
               {PRICE_BANDS.map((b, i) => <option key={i} value={i}>{b.label}</option>)}
             </select>
           </div>
 
           {/* Result count */}
-          <div style={{ marginLeft:"auto", fontSize:13, fontWeight:700, color:"#71717a", whiteSpace:"nowrap", paddingTop:18 }}>
+          <div className="text-[13px] font-bold text-zinc-500 whitespace-nowrap ml-auto">
             {filtered.length} result{filtered.length !== 1 ? "s" : ""}
           </div>
         </div>
 
         {/* ── Category pill strip ── */}
-        <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:28 }}>
+        <div className="evigo-pill-strip flex flex-wrap gap-2 mb-6 sm:mb-7">
           {(["All", ...SERVICE_CATEGORIES] as const).map((c) => {
             const active = category === c;
             return (
               <button key={c} onClick={() => setCategory(c as ServiceCategory | "All")}
-                style={{ padding:"6px 16px", borderRadius:99, border: active ? "none" : "1px solid #e4e4e7", background: active ? "linear-gradient(135deg,#8b5cf6,#06b6d4)" : "#fff", color: active ? "#fff" : "#52525b", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow: active ? "0 2px 10px rgba(139,92,246,0.3)" : "none", transition:"all 0.2s" }}>
+                className="px-4 py-1.5 rounded-full text-[13px] font-bold cursor-pointer transition-all duration-200"
+                style={{ border: active ? "none" : "1px solid #e4e4e7", background: active ? "linear-gradient(135deg,#8b5cf6,#06b6d4)" : "#fff", color: active ? "#fff" : "#52525b", boxShadow: active ? "0 2px 10px rgba(139,92,246,0.3)" : "none" }}>
                 {c}
               </button>
             );
