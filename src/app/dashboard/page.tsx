@@ -8,6 +8,7 @@ import { Button } from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
 import type { DemoBooking } from "@/lib/demoStore";
 import { getDemoBookings } from "@/lib/demoStore";
+import { ProfileUpload } from "@/components/ProfileUpload";
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -77,6 +78,10 @@ export default function ClientDashboard() {
               Sign Out
             </Button>
           </div>
+        </div>
+
+        <div className="mt-8 flex items-center justify-center p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm">
+           <ProfileUpload />
         </div>
 
         {/* Bookings */}

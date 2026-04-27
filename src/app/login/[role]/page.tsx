@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Container } from "@/components/Container";
 import { useAuth } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/demoStore";
-import { checkOrSetDemoPassword } from "@/lib/demoStore";
+import { checkOrSetDemoPassword, resetDemoPassword } from "@/lib/demoStore";
 
 function normalizePhone(raw: string) {
   const v = raw.replace(/\s+/g, "");
@@ -29,7 +29,7 @@ export default function LoginPage() {
     [params.role]
   );
 
-  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [step, setStep] = useState<"phone" | "otp" | "reset">("phone");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +70,26 @@ export default function LoginPage() {
       loginAsDemo(p, role);
       router.replace(role === "provider" ? "/provider/dashboard" : "/dashboard");
     }, 700);
+  };
+
+  const handleResetPassword = () => {
+    setError(null);
+    if (password.trim().length < 4) {
+      setError("Password must be at least 4 characters.");
+      return;
+    }
+    const p = normalizePhone(phone) || phone;
+    const success = resetDemoPassword(p, password.trim());
+    if (success) {
+      setNotice("Password reset successfully. Logging in...");
+      setSubmitting(true);
+      setTimeout(() => {
+        loginAsDemo(p, role);
+        router.replace(role === "provider" ? "/provider/dashboard" : "/dashboard");
+      }, 700);
+    } else {
+      setError("Could not reset password. Account not found.");
+    }
   };
 
   // shared input style
@@ -321,7 +341,7 @@ export default function LoginPage() {
                   🔒 Demo Mode — no real SMS sent
                 </p>
               </div>
-            ) : (
+            ) : step === "otp" ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {notice && (
                   <div
@@ -377,9 +397,31 @@ export default function LoginPage() {
                       e.currentTarget.style.boxShadow = "none";
                     }}
                   />
-                  <p style={{ marginTop: 6, fontSize: 12, color: "#9ca3af", textAlign: "center" }}>
-                    New number? We will set this as your password.
-                  </p>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, alignItems: "center" }}>
+                    <p style={{ fontSize: 12, color: "#9ca3af" }}>
+                      New number? We will set this as your password.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStep("reset");
+                        setPassword("");
+                        setError(null);
+                        setNotice("Enter a new password to reset your account.");
+                      }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#a78bfa",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        textDecoration: "underline"
+                      }}
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                 </div>
 
                 {error && (
@@ -464,6 +506,128 @@ export default function LoginPage() {
                   }}
                 >
                   ← Change Number
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {notice && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      background: "rgba(59,130,246,0.1)",
+                      border: "1px solid rgba(59,130,246,0.25)",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>ℹ️</span>
+                    <span style={{ color: "#93c5fd", fontSize: 13, fontWeight: 600 }}>{notice}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "#d1d5db",
+                      marginBottom: 8,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && !submitting && handleResetPassword()}
+                    placeholder="••••••••"
+                    style={{
+                      ...inputStyle,
+                      fontSize: 24,
+                      fontWeight: 700,
+                      letterSpacing: "0.2em",
+                      textAlign: "center",
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(139,92,246,0.6)";
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.1)";
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  />
+                </div>
+
+                {error && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      background: "rgba(239,68,68,0.1)",
+                      border: "1px solid rgba(239,68,68,0.25)",
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>⚠️</span>
+                    <span style={{ color: "#fca5a5", fontSize: 13, fontWeight: 600 }}>{error}</span>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleResetPassword}
+                  disabled={submitting}
+                  style={{
+                    width: "100%",
+                    padding: "13px 20px",
+                    borderRadius: 12,
+                    border: "none",
+                    background: submitting
+                      ? "rgba(139,92,246,0.4)"
+                      : "linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)",
+                    color: "#ffffff",
+                    fontSize: 15,
+                    fontWeight: 700,
+                    cursor: submitting ? "not-allowed" : "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    boxShadow: submitting ? "none" : "0 4px 20px rgba(139,92,246,0.35)",
+                  }}
+                >
+                  {submitting ? "Resetting..." : "Reset Password ✓"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep("otp");
+                    setPassword("");
+                    setNotice(null);
+                    setError(null);
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 16px",
+                    borderRadius: 12,
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    background: "rgba(255,255,255,0.05)",
+                    color: "#d1d5db",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  ← Back to Login
                 </button>
               </div>
             )}

@@ -108,15 +108,25 @@ div[style*="position: fixed"][style*="bottom"] {
 @media (max-width: 720px) {
   .evigo-emp-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 32px;
   }
 }
 @media (max-width: 480px) {
   .evigo-emp-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
     margin-bottom: 28px;
+    padding-bottom: 8px;
+  }
+  .evigo-emp-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .evigo-emp-grid > div {
+    flex: 0 0 75%;
+    scroll-snap-align: start;
   }
 }
 

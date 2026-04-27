@@ -13,6 +13,7 @@ export type DemoUser = {
   uid: string;
   phone: string;
   role: UserRole;
+  profileImage?: string;
 };
 
 export type DemoProvider = {
@@ -65,6 +66,22 @@ export function checkOrSetDemoPassword(phone: string, password: string): boolean
   }
 }
 
+export function resetDemoPassword(phone: string, newPassword: string): boolean {
+  if (typeof window === "undefined") return false;
+  let passwords: Record<string, string> = {};
+  try {
+    const raw = localStorage.getItem(PASSWORDS_KEY);
+    if (raw) passwords = JSON.parse(raw);
+  } catch {}
+
+  if (passwords[phone]) {
+    passwords[phone] = newPassword;
+    localStorage.setItem(PASSWORDS_KEY, JSON.stringify(passwords));
+    return true;
+  }
+  return false;
+}
+
 // ─────────────────────────── AUTH ───────────────────────────────
 const AUTH_KEY = "evigo_demo_user";
 
@@ -80,6 +97,14 @@ export function getDemoUser(): DemoUser | null {
 
 export function setDemoUser(user: DemoUser) {
   localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+}
+
+export function updateDemoUserProfileImage(imageUrl: string) {
+  const user = getDemoUser();
+  if (user) {
+    user.profileImage = imageUrl;
+    setDemoUser(user);
+  }
 }
 
 export function clearDemoUser() {

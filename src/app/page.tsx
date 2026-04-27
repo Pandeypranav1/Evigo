@@ -324,13 +324,10 @@ export default function Home() {
           {/* 5 Image Cards */}
           <ScrollReveal animation="fade-up" staggerChildren={150}>
             <div className="evigo-emp-grid">
-              {[
-                { src: "/nari-catering.png",    accent: "#f59e0b", shadow: "rgba(245,158,11,0.4)"  },
-                { src: "/emp-photography.png",   accent: "#06b6d4", shadow: "rgba(6,182,212,0.4)"   },
-                { src: "/emp-dj.png",            accent: "#8b5cf6", shadow: "rgba(139,92,246,0.4)"  },
-                { src: "/evigo-mehendi.png",      accent: "#ec4899", shadow: "rgba(236,72,153,0.4)"  },
-                { src: "/evigo-cultural.png",     accent: "#10b981", shadow: "rgba(16,185,129,0.4)"  },
-              ].map((card, i) => (
+              {EMPOWERMENT_IMAGES.map((card, i) => {
+                const accents = ["#f59e0b", "#06b6d4", "#8b5cf6", "#ec4899", "#10b981"];
+                const accent = accents[i % accents.length];
+                return (
                 <div
                   key={i}
                   className="relative rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-3 hover:scale-[1.02]"
@@ -350,14 +347,17 @@ export default function Home() {
                     sizes="(max-width: 480px) 100vw, (max-width: 720px) 50vw, (max-width: 1200px) 32vw, 20vw"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 pointer-events-none" style={{
-                    background: "linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 40%)",
-                  }} />
+                  <div className="absolute inset-0 pointer-events-none flex flex-col justify-end p-4" style={{
+                    background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, transparent 100%)",
+                  }}>
+                    <div className="text-white font-bold text-sm sm:text-base mb-1">{card.label}</div>
+                    <div className="text-gray-300 text-xs sm:text-sm font-medium">{card.sub}</div>
+                  </div>
                   <div className="absolute top-0 left-0 right-0 h-[3px]" style={{
-                    background: `linear-gradient(90deg, ${card.accent}, ${card.accent}55)`,
+                    background: `linear-gradient(90deg, ${accent}, ${accent}55)`,
                   }} />
                 </div>
-              ))}
+              )})}
             </div>
           </ScrollReveal>
 

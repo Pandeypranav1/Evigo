@@ -16,29 +16,43 @@ export const CATEGORY_TAGLINE: Record<ServiceCategory, string> = {
   Cultural:          "Madhubani-inspired decor and cultural art",
 };
 
-// All images are local AI-generated assets — zero external dependency
 export const CATEGORY_IMAGE: Record<ServiceCategory, string> = {
-  Catering:          "/svc-catering.png",
-  Photography:       "/svc-photography.png",
-  DJ:                "/svc-dj.png",
-  "Mehendi & Makeup":"/evigo-mehendi.png",
-  Cultural:          "/evigo-cultural.png",
+  Catering:          "/catering_service_1777314249262.png",
+  Photography:       "/photography_service_1777314265964.png",
+  DJ:                "/dj_service_1777314281684.png",
+  "Mehendi & Makeup":"/mehendi_service_1777314296728.png",
+  Cultural:          "/mithila_cultural_1777314631804.png",
 };
 
-export const EMPOWERMENT_IMAGES: { src: string; label: string; sub: string }[] = [
+export const EMPOWERMENT_IMAGES: { src: string; label: string; sub: string; accent: string }[] = [
   {
-    src:   "/evigo-mehendi.png",
-    label: "Nari Shakti in Action",
-    sub:   "Mehendi & makeup artists earning with every event",
+    src: "/emp_mehendi_1777315417623.png",
+    label: "Mehendi Artistry",
+    sub: "Traditional artists sharing their craft",
+    accent: "#f59e0b",
   },
   {
-    src:   "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=1200&q=85",
-    label: "Empowering Women",
-    sub:   "Professional makeup artists at every celebration",
+    src: "/emp_makeup_1777315436915.png",
+    label: "Professional Makeover",
+    sub: "Independent makeup experts",
+    accent: "#06b6d4",
   },
   {
-    src:   "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=1200&q=85",
-    label: "Real Work, Real Income",
-    sub:   "Female event teams creating magic every day",
+    src: "/emp_catering_1777315455487.png",
+    label: "Catering Excellence",
+    sub: "Women-led cooking teams",
+    accent: "#8b5cf6",
+  },
+  {
+    src: "/emp_photographer_1777315475083.png",
+    label: "Event Photography",
+    sub: "Capturing moments professionally",
+    accent: "#ec4899",
+  },
+  {
+    src: "/emp_cultural_1777315492625.png",
+    label: "Madhubani Artists",
+    sub: "Preserving cultural heritage",
+    accent: "#10b981",
   },
 ];
