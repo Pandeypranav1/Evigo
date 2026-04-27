@@ -235,19 +235,19 @@ export function Footer() {
                 support@evigo.in
               </a>
               <a
-                href="tel:+919876543210"
+                href="tel:+917808807340"
                 className="flex items-center gap-2.5 text-sm text-gray-400 no-underline transition-colors duration-200 hover:text-purple-400"
               >
                 <span className="flex items-center justify-center w-8 h-8 rounded-lg text-sm" style={{ background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.2)" }}>
                   📞
                 </span>
-                +91 98765 43210
+                +91 7808807340
               </a>
               <div className="flex items-center gap-2.5 text-sm text-gray-400">
                 <span className="flex items-center justify-center w-8 h-8 rounded-lg text-sm" style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)" }}>
                   📍
                 </span>
-                Patna, Bihar, India
+                Samastipur, Bihar, India
               </div>
             </div>
           </div>
