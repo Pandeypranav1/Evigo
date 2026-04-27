@@ -45,8 +45,25 @@ export type DemoBooking = {
   updatedAt: number;
 };
 
-// ─────────────────────────── DEMO OTP ───────────────────────────
-export const DEMO_OTP = "123456";
+// ─────────────────────────── DEMO PASSWORDS ───────────────────────
+const PASSWORDS_KEY = "evigo_demo_passwords";
+
+export function checkOrSetDemoPassword(phone: string, password: string): boolean {
+  if (typeof window === "undefined") return false;
+  let passwords: Record<string, string> = {};
+  try {
+    const raw = localStorage.getItem(PASSWORDS_KEY);
+    if (raw) passwords = JSON.parse(raw);
+  } catch {}
+
+  if (passwords[phone]) {
+    return passwords[phone] === password;
+  } else {
+    passwords[phone] = password;
+    localStorage.setItem(PASSWORDS_KEY, JSON.stringify(passwords));
+    return true;
+  }
+}
 
 // ─────────────────────────── AUTH ───────────────────────────────
 const AUTH_KEY = "evigo_demo_user";
@@ -93,6 +110,12 @@ export function saveDemoProvider(p: Omit<DemoProvider, "id" | "createdAt" | "isA
   providers.unshift(newProvider);
   localStorage.setItem(PROVIDERS_KEY, JSON.stringify(providers));
   return newProvider;
+}
+
+export function deleteDemoProvider(id: string) {
+  const providers = getDemoProviders();
+  const updated = providers.filter((p) => p.id !== id);
+  localStorage.setItem(PROVIDERS_KEY, JSON.stringify(updated));
 }
 
 // ─────────────────────────── BOOKINGS ───────────────────────────

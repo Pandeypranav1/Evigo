@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Container } from "@/components/Container";
 import { useAuth } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/demoStore";
-import { DEMO_OTP } from "@/lib/demoStore";
+import { checkOrSetDemoPassword } from "@/lib/demoStore";
 
 function normalizePhone(raw: string) {
   const v = raw.replace(/\s+/g, "");
@@ -31,7 +31,7 @@ export default function LoginPage() {
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -46,23 +46,27 @@ export default function LoginPage() {
       return;
     }
     setSubmitting(true);
-    // Simulate OTP send delay
     setTimeout(() => {
       setSubmitting(false);
       setStep("otp");
-      setNotice(`Demo OTP sent! Use code: ${DEMO_OTP}`);
-    }, 900);
+      setNotice(`Account found or new. Please enter a password.`);
+    }, 400);
   };
 
   const verifyOtp = () => {
     setError(null);
-    if (otp.trim() !== DEMO_OTP) {
-      setError("Wrong OTP. For demo, use: " + DEMO_OTP);
+    if (password.trim().length < 4) {
+      setError("Password must be at least 4 characters.");
+      return;
+    }
+    const p = normalizePhone(phone) || phone;
+    const isValid = checkOrSetDemoPassword(p, password.trim());
+    if (!isValid) {
+      setError("Incorrect password for this number.");
       return;
     }
     setSubmitting(true);
     setTimeout(() => {
-      const p = normalizePhone(phone) || phone;
       loginAsDemo(p, role);
       router.replace(role === "provider" ? "/provider/dashboard" : "/dashboard");
     }, 700);
@@ -175,9 +179,9 @@ export default function LoginPage() {
               gap: 8,
             }}
           >
-            <span style={{ fontSize: 16 }}>🧪</span>
+            <span style={{ fontSize: 16 }}>🔐</span>
             <span style={{ color: "#fde68a", fontSize: 13, fontWeight: 600 }}>
-              Demo Mode — Enter any number. OTP is <strong>123456</strong>
+              Demo Mode — Login with your password, or set a new one.
             </span>
           </div>
 
@@ -306,10 +310,10 @@ export default function LoginPage() {
                           animation: "spin 0.7s linear infinite",
                         }}
                       />
-                      Sending OTP…
+                      Verifying…
                     </>
                   ) : (
-                    "Send OTP →"
+                    "Continue →"
                   )}
                 </button>
 
@@ -348,20 +352,20 @@ export default function LoginPage() {
                       textTransform: "uppercase",
                     }}
                   >
-                    Enter OTP
+                    Enter Password
                   </label>
                   <input
                     id="login-otp-input"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !submitting && verifyOtp()}
-                    placeholder="123456"
-                    maxLength={6}
+                    placeholder="••••••••"
                     style={{
                       ...inputStyle,
                       fontSize: 24,
                       fontWeight: 700,
-                      letterSpacing: "0.4em",
+                      letterSpacing: "0.2em",
                       textAlign: "center",
                     }}
                     onFocus={(e) => {
@@ -373,8 +377,8 @@ export default function LoginPage() {
                       e.currentTarget.style.boxShadow = "none";
                     }}
                   />
-                  <p style={{ marginTop: 6, fontSize: 12, color: "#9ca3af" }}>
-                    Demo OTP sent to {phone}
+                  <p style={{ marginTop: 6, fontSize: 12, color: "#9ca3af", textAlign: "center" }}>
+                    New number? We will set this as your password.
                   </p>
                 </div>
 
@@ -443,7 +447,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => {
                     setStep("phone");
-                    setOtp("");
+                    setPassword("");
                     setNotice(null);
                     setError(null);
                   }}

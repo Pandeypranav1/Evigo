@@ -7,7 +7,7 @@ import { Container } from "@/components/Container";
 import { Button } from "@/components/Button";
 import { useAuth } from "@/context/AuthContext";
 import type { DemoBooking, DemoProvider } from "@/lib/demoStore";
-import { getDemoBookings, getDemoProviders, updateDemoBookingStatus } from "@/lib/demoStore";
+import { getDemoBookings, getDemoProviders, updateDemoBookingStatus, deleteDemoProvider } from "@/lib/demoStore";
 
 export default function ProviderDashboard() {
   const router = useRouter();
@@ -50,6 +50,14 @@ export default function ProviderDashboard() {
       prev.map((b) => (b.id === id ? { ...b, status: next } : b))
     );
     setTimeout(() => setUpdating(null), 400);
+  };
+
+  const handleDeleteListing = (id: string) => {
+    if (window.confirm("Are you sure you want to remove this listing?")) {
+      deleteDemoProvider(id);
+      setMyListings((prev) => prev.filter((l) => l.id !== id));
+      window.dispatchEvent(new Event("storage"));
+    }
   };
 
   const handleSignOut = () => {
@@ -121,8 +129,17 @@ export default function ProviderDashboard() {
                       Live
                     </span>
                   </div>
-                  <div className="mt-2 text-sm font-bold text-violet-700">
-                    ₹{l.startingPrice.toLocaleString("en-IN")}+
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="text-sm font-bold text-violet-700">
+                      ₹{l.startingPrice.toLocaleString("en-IN")}+
+                    </div>
+                    <button
+                      onClick={() => handleDeleteListing(l.id)}
+                      className="text-xs font-bold text-red-500 hover:text-red-700 underline"
+                      title="Remove Listing"
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
               ))}
