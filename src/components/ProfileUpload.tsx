@@ -40,13 +40,13 @@ export function ProfileUpload() {
   const initial = user?.phone ? user.phone.charAt(0).toUpperCase() : "U";
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center">
       <div 
         className="group relative cursor-pointer"
         onClick={() => !isUploading && fileInputRef.current?.click()}
       >
-        <div className="relative w-[90px] h-[90px] sm:w-[120px] sm:h-[120px] rounded-full p-1 bg-gradient-to-tr from-violet-600 to-cyan-500 transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(139,92,246,0.6)]">
-          <div className="w-full h-full rounded-full overflow-hidden bg-zinc-900 border-2 border-white/10 relative flex items-center justify-center">
+        <div className="relative w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] rounded-full p-1 bg-gradient-to-tr from-violet-600 to-cyan-500 transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+          <div className="w-full h-full rounded-full overflow-hidden bg-[#0f0a1e] border-2 border-white/10 relative flex items-center justify-center">
             {imagePreview ? (
               <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
             ) : (
@@ -56,7 +56,7 @@ export function ProfileUpload() {
             )}
             
             {isUploading && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
                 <span className="block w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               </div>
             )}
@@ -64,9 +64,9 @@ export function ProfileUpload() {
         </div>
 
         {/* Edit Icon Overlay */}
-        <div className="absolute top-0 right-0 w-8 h-8 rounded-full bg-white text-zinc-900 flex items-center justify-center shadow-lg border-2 border-zinc-900 transition-transform duration-300 group-hover:scale-110">
+        <div className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 text-white flex items-center justify-center shadow-lg border-2 border-[#0b0416] transition-transform duration-300 group-hover:scale-110">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
           </svg>
         </div>
 
@@ -80,19 +80,16 @@ export function ProfileUpload() {
         />
       </div>
 
-      <div className="mt-4 flex flex-col items-center gap-1.5">
-        <button 
-          onClick={() => !isUploading && fileInputRef.current?.click()}
-          className="text-sm font-bold text-zinc-800 hover:text-violet-600 transition-colors"
-        >
-          Change Photo
-        </button>
+      <div className="mt-3 flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute -bottom-8">
         {imagePreview && (
           <button 
-            onClick={handleRemovePhoto}
-            className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemovePhoto();
+            }}
+            className="text-[10px] font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-md"
           >
-            Remove Photo
+            Remove
           </button>
         )}
       </div>

@@ -57,31 +57,40 @@ export default function ClientDashboard() {
   return (
     <main className="flex-1 py-10">
       <Container>
-        {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 border border-cyan-200 px-3 py-1 text-xs font-bold text-cyan-700 mb-2">
-              👤 Client Dashboard
+        {/* Profile Header Card */}
+        <div className="bg-white rounded-3xl border border-zinc-200 shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 relative overflow-hidden">
+          {/* Subtle background decoration */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 rounded-full bg-violet-500/10 blur-3xl pointer-events-none"></div>
+          
+          <div className="shrink-0 z-10">
+            <ProfileUpload />
+          </div>
+          
+          <div className="flex-1 text-center sm:text-left z-10 w-full flex flex-col justify-center">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-cyan-50 border border-cyan-200 px-3 py-1 text-xs font-bold text-cyan-700 mb-3">
+                  👤 Client Dashboard
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-900">
+                  Welcome, {user?.phone || "Guest"}
+                </h1>
+                <p className="mt-2 text-sm font-medium text-zinc-500 max-w-lg mx-auto sm:mx-0">
+                  Track your event bookings, manage your profile, and explore top-rated services for your next event.
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto mt-2 lg:mt-0">
+                <Link href="/explore" className="w-full sm:w-auto">
+                  <Button className="w-full shadow-lg shadow-cyan-500/20 bg-gradient-to-r from-cyan-500 to-blue-500 border-0 text-white hover:opacity-90">Book a Service</Button>
+                </Link>
+                <Button variant="secondary" onClick={handleSignOut} className="w-full sm:w-auto hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors">
+                  Sign Out
+                </Button>
+              </div>
             </div>
-            <h1 className="text-3xl font-black tracking-tight text-zinc-900">
-              Your Bookings
-            </h1>
-            <p className="mt-1 text-sm font-semibold text-zinc-500">
-              {user?.phone || "Guest"} • Track your event bookings
-            </p>
           </div>
-          <div className="flex gap-2">
-            <Link href="/explore">
-              <Button>Book a Service</Button>
-            </Link>
-            <Button variant="secondary" onClick={handleSignOut}>
-              Sign Out
-            </Button>
-          </div>
-        </div>
-
-        <div className="mt-8 flex items-center justify-center p-6 bg-white rounded-3xl border border-zinc-200 shadow-sm">
-           <ProfileUpload />
         </div>
 
         {/* Bookings */}
