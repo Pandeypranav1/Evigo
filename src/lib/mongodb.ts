@@ -2,13 +2,6 @@ import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
-if (!MONGODB_URI) {
-  // Non-fatal in demo mode — the app falls back to localStorage
-  console.warn(
-    "[Evigo] MONGODB_URI not set. API routes will return demo data from localStorage fallback."
-  );
-}
-
 /**
  * Global cache so Next.js HMR doesn't open multiple connections.
  */
@@ -29,7 +22,7 @@ export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) return cached.conn;
 
   if (!MONGODB_URI) {
-    throw new Error("MONGODB_URI environment variable is not defined.");
+    throw new Error("MongoDB not configured");
   }
 
   if (!cached.promise) {

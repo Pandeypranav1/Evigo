@@ -1,20 +1,20 @@
 "use client";
 
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Container } from "@/components/Container";
 import { useAuth, UserRole } from "@/context/AuthContext";
 
-function normalizePhone(raw: string) {
-  const v = raw.replace(/\s+/g, "");
-  if (v.startsWith("+")) return v;
-  if (v.startsWith("0")) return `+91${v.slice(1)}`;
-  if (/^\d{10}$/.test(v)) return `+91${v}`;
+function getTenDigits(raw: string) {
+  const v = raw.replace(/\D/g, "");
+  if (v.length === 12 && v.startsWith("91")) return v.slice(2);
+  if (v.length === 11 && v.startsWith("0")) return v.slice(1);
   return v;
 }
 
 function isValidPhone(v: string) {
-  return /^\+91\d{10}$/.test(v) || /^\d{10}$/.test(v);
+  const tenDigits = getTenDigits(v);
+  return /^[6-9]\d{9}$/.test(tenDigits);
 }
 
 export default function LoginPage() {
@@ -33,15 +33,24 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [resendTimer, setResendTimer] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const isProvider = role === "provider";
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => setResendTimer((prev) => prev - 1), 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
   const handleSendOtp = async () => {
     setError(null);
-    const p = normalizePhone(phone);
-    if (!isValidPhone(p) && !isValidPhone(phone)) {
-      setError("Enter a valid 10-digit mobile number.");
+    setNotice(null);
+    if (!isValidPhone(phone)) {
+      setError("Enter a valid Indian mobile number");
       return;
     }
     setSubmitting(true);
@@ -49,36 +58,35 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: p }),
+        body: JSON.stringify({ phone }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send OTP");
       
       setStep("otp");
-      setNotice("OTP sent successfully. (Demo mode: use 123456)");
+      setNotice(data.message || "OTP sent successfully.");
+      setResendTimer(30);
     } catch (err: any) {
-      // Fallback safety
-      setStep("otp");
-      setNotice("Network issue: Fallback demo mode active. Use 123456.");
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = async (otpOverride?: string) => {
     setError(null);
-    const otpValue = otp.join("");
+    setNotice(null);
+    const otpValue = otpOverride || otp.join("");
     if (otpValue.length < 6) {
       setError("Please enter the complete 6-digit OTP.");
       return;
     }
-    const p = normalizePhone(phone) || phone;
     setSubmitting(true);
     try {
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: p, otp: otpValue, role }),
+        body: JSON.stringify({ phone, otp: otpValue, role }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Invalid OTP");
@@ -103,6 +111,11 @@ export default function LoginPage() {
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
+
+    const currentOtpStr = newOtp.join("");
+    if (currentOtpStr.length === 6) {
+       handleVerifyOtp(currentOtpStr);
+    }
   };
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -112,20 +125,6 @@ export default function LoginPage() {
     if (e.key === "Enter") {
       if (!submitting) handleVerifyOtp();
     }
-  };
-
-  // shared input style
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    background: "#1a1a1a",
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 12,
-    padding: "12px 16px",
-    color: "#ffffff",
-    fontSize: 15,
-    fontWeight: 500,
-    outline: "none",
-    boxSizing: "border-box",
   };
 
   // OTP box style
@@ -179,7 +178,7 @@ export default function LoginPage() {
       />
 
       <Container>
-        <div className="mx-auto max-w-md w-full">
+        <div className="mx-auto max-w-md w-full relative z-10">
           {/* Logo */}
           <div className="text-center mb-8">
             <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
@@ -273,23 +272,49 @@ export default function LoginPage() {
                   >
                     Mobile Number
                   </label>
-                  <input
-                    id="login-phone-input"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && !submitting && handleSendOtp()}
-                    placeholder="+91 XXXXX XXXXX"
-                    type="tel"
-                    style={{ ...inputStyle, color: "#ffffff" }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(139,92,246,0.6)";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
+                  <div style={{ position: "relative" }}>
+                    <div style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "#9ca3af",
+                      fontSize: 16,
+                      pointerEvents: "none"
+                    }}>
+                      📞
+                    </div>
+                    <input
+                      id="login-phone-input"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && !submitting && handleSendOtp()}
+                      placeholder="Enter 10-digit number"
+                      type="tel"
+                      maxLength={10}
+                      style={{
+                        width: "100%",
+                        background: "#1a1a1a",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        borderRadius: 12,
+                        padding: "12px 16px 12px 48px",
+                        color: "#ffffff",
+                        fontSize: 16,
+                        fontWeight: 600,
+                        outline: "none",
+                        boxSizing: "border-box",
+                        transition: "all 0.2s"
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "rgba(139,92,246,0.6)";
+                        e.currentTarget.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.1)";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    />
+                  </div>
                 </div>
 
                 {error && (
@@ -330,6 +355,7 @@ export default function LoginPage() {
                     justifyContent: "center",
                     gap: 8,
                     boxShadow: submitting ? "none" : "0 4px 20px rgba(139,92,246,0.35)",
+                    transition: "all 0.2s"
                   }}
                 >
                   {submitting ? (
@@ -378,7 +404,7 @@ export default function LoginPage() {
                       fontSize: 12,
                       fontWeight: 700,
                       color: "#d1d5db",
-                      marginBottom: 8,
+                      marginBottom: 12,
                       letterSpacing: "0.05em",
                       textTransform: "uppercase",
                       textAlign: "center"
@@ -386,19 +412,22 @@ export default function LoginPage() {
                   >
                     Enter 6-digit OTP
                   </label>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 6 }}>
                     {otp.map((digit, index) => (
                       <input
                         key={index}
                         ref={(el) => { inputRefs.current[index] = el; }}
                         id={`otp-input-${index}`}
                         type="text"
+                        maxLength={1}
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
                         style={{
                           ...otpBoxStyle,
-                          color: "#ffffff"
+                          width: "44px",
+                          color: "#ffffff",
+                          transition: "all 0.2s"
                         }}
                         onFocus={(e) => {
                           e.currentTarget.style.borderColor = "rgba(6,182,212,0.6)";
@@ -432,7 +461,7 @@ export default function LoginPage() {
 
                 <button
                   id="login-verify-otp-btn"
-                  onClick={handleVerifyOtp}
+                  onClick={() => handleVerifyOtp()}
                   disabled={submitting}
                   style={{
                     width: "100%",
@@ -451,6 +480,7 @@ export default function LoginPage() {
                     justifyContent: "center",
                     gap: 8,
                     boxShadow: submitting ? "none" : "0 4px 20px rgba(6,182,212,0.35)",
+                    transition: "all 0.2s"
                   }}
                 >
                   {submitting ? (
@@ -472,29 +502,49 @@ export default function LoginPage() {
                     "Verify & Login ✓"
                   )}
                 </button>
+                
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (resendTimer > 0 || submitting) return;
+                      handleSendOtp();
+                    }}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: resendTimer > 0 ? "#6b7280" : "#a78bfa",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: resendTimer > 0 ? "not-allowed" : "pointer",
+                      padding: 0
+                    }}
+                  >
+                    {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : "Resend OTP"}
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("phone");
-                    setOtp(["", "", "", "", "", ""]);
-                    setNotice(null);
-                    setError(null);
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 16px",
-                    borderRadius: 12,
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    background: "rgba(255,255,255,0.05)",
-                    color: "#d1d5db",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  ← Change Number
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep("phone");
+                      setOtp(["", "", "", "", "", ""]);
+                      setNotice(null);
+                      setError(null);
+                      setResendTimer(0);
+                    }}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#9ca3af",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      padding: 0
+                    }}
+                  >
+                    Change Number
+                  </button>
+                </div>
               </div>
             )}
           </div>

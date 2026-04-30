@@ -3,6 +3,13 @@ import { verifyOTP } from "@/lib/otpStore";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
 
+function getTenDigits(raw: string) {
+  const v = raw.replace(/\D/g, "");
+  if (v.length === 12 && v.startsWith("91")) return v.slice(2);
+  if (v.length === 11 && v.startsWith("0")) return v.slice(1);
+  return v;
+}
+
 export async function POST(request: Request) {
   try {
     const { phone, otp, role } = await request.json();
@@ -11,24 +18,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Phone and OTP are required" }, { status: 400 });
     }
 
-    const verification = verifyOTP(phone, otp);
+    const tenDigits = getTenDigits(phone);
+    const normalizedPhone = `+91${tenDigits}`;
+
+    const verification = verifyOTP(normalizedPhone, otp);
     if (!verification.success) {
       return NextResponse.json({ error: verification.message }, { status: 400 });
     }
 
-    // Connect to DB and handle user role
-    await connectDB();
+    try {
+      await connectDB();
+    } catch (dbError) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
     
-    let user = await User.findOne({ phone });
+    let user = await User.findOne({ phone: normalizedPhone });
     if (!user) {
       if (!role) {
          return NextResponse.json({ error: "Role is required for new users" }, { status: 400 });
       }
-      user = await User.create({ phone, role });
+      user = await User.create({ phone: normalizedPhone, role });
     }
 
-    // In a real app we'd sign a JWT here. 
-    // We'll return user data to let the client handle session.
     return NextResponse.json({ 
       success: true, 
       user: {
@@ -40,6 +51,6 @@ export async function POST(request: Request) {
     });
 
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to verify OTP" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to verify OTP or Server error" }, { status: 500 });
   }
 }

@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { sendOTP } from "@/lib/otpStore";
 
-// In a real production app we'd use rate limiting like Upstash Redis.
-// Here we do a simple in-memory rate limit for demo.
 const rateLimit = new Map<string, number>();
+
+function getTenDigits(raw: string) {
+  const v = raw.replace(/\D/g, "");
+  if (v.length === 12 && v.startsWith("91")) return v.slice(2);
+  if (v.length === 11 && v.startsWith("0")) return v.slice(1);
+  return v;
+}
 
 export async function POST(request: Request) {
   try {
@@ -13,20 +18,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
     }
 
-    // Rate Limit (1 per minute per number)
-    const lastSent = rateLimit.get(phone);
-    if (lastSent && Date.now() - lastSent < 60000) {
-      return NextResponse.json({ error: "Please wait 1 minute before requesting another OTP." }, { status: 429 });
+    const tenDigits = getTenDigits(phone);
+    if (!/^[6-9]\d{9}$/.test(tenDigits)) {
+      return NextResponse.json({ error: "Enter a valid Indian mobile number" }, { status: 400 });
     }
-    rateLimit.set(phone, Date.now());
 
-    // Generate static OTP for now or random 6 digits
-    const otp = "123456"; 
+    const normalizedPhone = `+91${tenDigits}`;
 
-    await sendOTP(phone, otp);
+    // Demo Mode Check
+    const isRealMode = !!process.env.TWILIO_ACCOUNT_SID;
+    if (!isRealMode) {
+      const allowedDemoNumbers = ["9999999999", "8888888888"];
+      if (!allowedDemoNumbers.includes(tenDigits)) {
+        return NextResponse.json({ error: "Demo login is restricted. Use valid number." }, { status: 403 });
+      }
+    }
+
+    // Rate Limit (1 per 30s per number)
+    const lastSent = rateLimit.get(normalizedPhone);
+    if (lastSent && Date.now() - lastSent < 30000) {
+      return NextResponse.json({ error: "Please wait 30 seconds before requesting another OTP." }, { status: 429 });
+    }
+    rateLimit.set(normalizedPhone, Date.now());
+
+    // Generate static OTP for demo mode, or random 6 digits for real mode
+    const otp = !isRealMode ? "123456" : Math.floor(100000 + Math.random() * 900000).toString();
+
+    await sendOTP(normalizedPhone, otp);
 
     return NextResponse.json({ success: true, message: "OTP sent successfully" });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to send OTP" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
   }
 }
