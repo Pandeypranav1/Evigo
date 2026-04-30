@@ -138,7 +138,7 @@ export function Header() {
                   Login
                 </Link>
                 <div className="h-5 w-px bg-white/10" />
-                <Link href="/partner" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/[0.05] border border-white/10 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20">
+                <Link href="/partner" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-2.5 text-sm font-bold text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(56,189,248,0.5)]">
                   Become a Partner
                 </Link>
                 <Link href="/explore" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white text-[#05030f] px-6 py-2.5 font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]">
