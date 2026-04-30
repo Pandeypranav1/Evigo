@@ -110,38 +110,60 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#05030f]/80 backdrop-blur-xl shadow-lg">
-        <div className="mx-auto flex h-16 sm:h-20 max-w-[1200px] items-center justify-between px-5 sm:px-6">
+      <header className="sticky top-0 z-50 w-full bg-[#05030f]/70 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] before:absolute before:inset-0 before:-z-10 before:bg-gradient-to-r before:from-violet-500/10 before:via-transparent before:to-cyan-500/10">
+        <div className="mx-auto flex h-20 max-w-[1200px] items-center justify-between px-5 sm:px-6">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400" onClick={() => setMenuOpen(false)}>
-            Evigo
+          <Link href="/" className="group flex items-center gap-2" onClick={() => setMenuOpen(false)}>
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+              <span className="text-xl font-black text-white">E</span>
+            </div>
+            <span className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 transition-colors group-hover:from-violet-400 group-hover:to-cyan-400">
+              Evigo
+            </span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-1 bg-white/[0.03] px-4 py-2 rounded-full border border-white/5 shadow-inner">
             <NavLink href="/explore">Explore</NavLink>
+            <NavLink href="/services">Services</NavLink>
             <NavLink href="/about">About</NavLink>
+            <NavLink href="/contact">Contact</NavLink>
           </nav>
 
           {/* Desktop CTAs */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-5">
             {!user ? (
               <>
-                <Link href="/login/client" className="text-[14px] font-semibold text-white/80 hover:text-white transition-colors">
+                <Link href="/login/client" className="text-[14px] font-semibold text-white/70 hover:text-white transition-colors relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-white after:transition-all hover:after:w-full">
                   Login
                 </Link>
-                <Link href="/partner" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-2.5 font-bold text-white shadow-[0_4px_20px_rgba(139,92,246,0.3)] transition-all hover:scale-105 hover:shadow-[0_4px_24px_rgba(139,92,246,0.5)]">
+                <div className="h-5 w-px bg-white/10" />
+                <Link href="/partner" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/[0.05] border border-white/10 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20">
                   Become a Partner
+                </Link>
+                <Link href="/explore" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-2 font-bold text-white shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(56,189,248,0.6)]">
+                  <span className="absolute inset-0 bg-white/20 translate-y-full transition-transform group-hover:translate-y-0" />
+                  <span className="relative flex items-center gap-2">
+                    Book Now
+                    <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </span>
                 </Link>
               </>
             ) : (
-              <AvatarDropdown user={user} role={role} onSignOut={handleSignOut} />
+              <div className="flex items-center gap-4">
+                <Link href="/explore" className="hidden lg:flex group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-2 text-sm font-bold text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(56,189,248,0.5)]">
+                  Book Service
+                </Link>
+                <AvatarDropdown user={user} role={role} onSignOut={handleSignOut} />
+              </div>
             )}
           </div>
 
           {/* Mobile hamburger button */}
           <button
-            className="md:hidden relative z-[60] flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-full bg-white/5 border border-white/10"
+            className="md:hidden relative z-[60] flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md transition-colors hover:bg-white/10"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
@@ -154,7 +176,7 @@ export function Header() {
 
       {/* Mobile Menu Overlay */}
       <div 
-        className={`fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[55] bg-[#05030f]/80 backdrop-blur-xl transition-opacity duration-300 md:hidden ${
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setMenuOpen(false)}
@@ -162,61 +184,74 @@ export function Header() {
 
       {/* Mobile Menu Slide-in Panel */}
       <div 
-        className={`fixed top-0 right-0 z-[56] h-full w-[280px] bg-gradient-to-b from-[#0f0a1e] to-[#05030f] border-l border-white/10 shadow-2xl transition-transform duration-300 ease-out md:hidden flex flex-col ${
+        className={`fixed top-0 right-0 z-[56] h-full w-[300px] bg-[#0a0616] border-l border-white/10 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-out md:hidden flex flex-col ${
           menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex flex-col flex-1 px-6 pt-24 pb-8 overflow-y-auto">
           {user && (
-            <div className="mb-8 flex items-center gap-3 rounded-2xl bg-white/5 p-4 border border-white/10">
+            <div className="mb-8 flex items-center gap-4 rounded-2xl bg-gradient-to-br from-white/[0.05] to-transparent p-4 border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-violet-500 to-cyan-500" />
               {user.profileImage ? (
-                <img src={user.profileImage} alt="Profile" className="h-12 w-12 rounded-full object-cover shadow-inner" />
+                <img src={user.profileImage} alt="Profile" className="h-12 w-12 rounded-full object-cover shadow-inner ring-2 ring-white/10" />
               ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 text-lg font-bold text-white shadow-inner">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 text-lg font-bold text-white shadow-inner ring-2 ring-white/10">
                   {user.phone ? user.phone.charAt(0) : "U"}
                 </div>
               )}
               <div>
-                <div className="text-xs font-semibold text-white/50 uppercase">{role === "provider" ? "Partner" : "Client"}</div>
-                <div className="text-sm font-bold text-white truncate">{user.phone}</div>
+                <div className="text-[10px] font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400 uppercase tracking-widest">{role === "provider" ? "Partner" : "Client"}</div>
+                <div className="text-sm font-bold text-white truncate mt-0.5">{user.phone}</div>
               </div>
             </div>
           )}
 
           <nav className="flex flex-col gap-2">
-            <Link href="/explore" className="text-lg font-bold text-white/90 py-3 border-b border-white/5 hover:text-white" onClick={() => setMenuOpen(false)}>
+            <Link href="/explore" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
               Explore Services
+              <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link href="/services" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
+              All Services
+              <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link href="/about" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
+              About Us
+              <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link href="/contact" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
+              Contact
+              <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </Link>
             
             {user && (
               <>
-                <Link href="#" className="text-lg font-bold text-white/90 py-3 border-b border-white/5 hover:text-white" onClick={() => setMenuOpen(false)}>
-                  Profile
+                <Link href="#" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
+                  My Profile
+                  <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </Link>
-                <Link href="#" className="text-lg font-bold text-white/90 py-3 border-b border-white/5 hover:text-white" onClick={() => setMenuOpen(false)}>
-                  My Bookings
-                </Link>
-                <Link href={role === "provider" ? "/provider/dashboard" : "/dashboard"} className="text-lg font-bold text-white/90 py-3 border-b border-white/5 hover:text-white" onClick={() => setMenuOpen(false)}>
+                <Link href={role === "provider" ? "/provider/dashboard" : "/dashboard"} className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
                   Dashboard
+                  <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </Link>
               </>
-            )}
-            
-            {!user && (
-              <Link href="/login/client" className="text-lg font-bold text-white/90 py-3 border-b border-white/5 hover:text-white" onClick={() => setMenuOpen(false)}>
-                Client Login
-              </Link>
             )}
           </nav>
 
           <div className="mt-auto pt-8 flex flex-col gap-4">
             {!user ? (
-              <Link href="/partner" className="flex w-full items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-4 text-base font-bold text-white shadow-[0_4px_20px_rgba(139,92,246,0.4)] transition-transform hover:scale-105" onClick={() => setMenuOpen(false)}>
-                Become a Partner
-              </Link>
+              <>
+                <Link href="/login/client" className="flex w-full items-center justify-center rounded-xl bg-white/5 border border-white/10 px-6 py-4 text-base font-bold text-white transition-colors hover:bg-white/10" onClick={() => setMenuOpen(false)}>
+                  Client Login
+                </Link>
+                <Link href="/partner" className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-4 text-base font-bold text-white shadow-[0_4px_20px_rgba(139,92,246,0.3)] transition-all hover:shadow-[0_4px_30px_rgba(56,189,248,0.5)]" onClick={() => setMenuOpen(false)}>
+                  <span className="absolute inset-0 bg-white/20 translate-y-full transition-transform group-hover:translate-y-0" />
+                  <span className="relative">Become a Partner</span>
+                </Link>
+              </>
             ) : (
-              <button onClick={handleSignOut} className="flex w-full items-center justify-center rounded-full bg-red-500/10 border border-red-500/20 px-6 py-4 text-base font-bold text-red-400 transition-colors hover:bg-red-500/20">
-                Logout
+              <button onClick={handleSignOut} className="flex w-full items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 px-6 py-4 text-base font-bold text-red-400 transition-colors hover:bg-red-500/20 hover:text-red-300">
+                Sign Out
               </button>
             )}
           </div>

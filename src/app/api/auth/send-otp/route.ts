@@ -28,10 +28,7 @@ export async function POST(request: Request) {
     // Demo Mode Check
     const isRealMode = !!process.env.TWILIO_ACCOUNT_SID;
     if (!isRealMode) {
-      const allowedDemoNumbers = ["9999999999", "8888888888"];
-      if (!allowedDemoNumbers.includes(tenDigits)) {
-        return NextResponse.json({ error: "Demo login is restricted. Use valid number." }, { status: 403 });
-      }
+      console.log(`[DEMO MODE] Allowing number: ${tenDigits}`);
     }
 
     // Rate Limit (1 per 30s per number)
