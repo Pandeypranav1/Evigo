@@ -123,7 +123,7 @@ export function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1 bg-white/[0.03] px-4 py-2 rounded-full border border-white/5 shadow-inner">
+          <nav className="hidden md:flex items-center gap-6 bg-white/[0.03] px-8 py-2.5 rounded-full border border-white/5 shadow-inner">
             <NavLink href="/explore">Explore</NavLink>
             <NavLink href="/services">Services</NavLink>
             <NavLink href="/about">About</NavLink>
@@ -138,22 +138,21 @@ export function Header() {
                   Login
                 </Link>
                 <div className="h-5 w-px bg-white/10" />
-                <Link href="/partner" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/[0.05] border border-white/10 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20">
+                <Link href="/partner" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/[0.05] border border-white/10 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20">
                   Become a Partner
                 </Link>
-                <Link href="/explore" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-2 font-bold text-white shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(56,189,248,0.6)]">
-                  <span className="absolute inset-0 bg-white/20 translate-y-full transition-transform group-hover:translate-y-0" />
+                <Link href="/explore" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white text-[#05030f] px-6 py-2.5 font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]">
                   <span className="relative flex items-center gap-2">
                     Book Now
                     <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </span>
                 </Link>
               </>
             ) : (
               <div className="flex items-center gap-4">
-                <Link href="/explore" className="hidden lg:flex group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-2 text-sm font-bold text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(56,189,248,0.5)]">
+                <Link href="/explore" className="hidden lg:flex group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white text-[#05030f] px-5 py-2.5 text-sm font-bold shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(255,255,255,0.5)]">
                   Book Service
                 </Link>
                 <AvatarDropdown user={user} role={role} onSignOut={handleSignOut} />
