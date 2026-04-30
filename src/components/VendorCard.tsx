@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { Button } from "@/components/Button";
-import type { ProviderDoc } from "@/lib/firestoreTypes";
+import type { DemoProvider } from "@/lib/demoStore";
 
 export function VendorCard({
   provider,
   onBook,
 }: {
-  provider: ProviderDoc;
+  provider: DemoProvider;
   onBook: () => void;
 }) {
   return (

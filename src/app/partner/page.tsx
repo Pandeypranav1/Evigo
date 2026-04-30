@@ -86,7 +86,7 @@ export default function PartnerPage() {
 
     setTimeout(() => {
       saveDemoProvider({
-        ownerUid: user.uid,
+        ownerUid: user.id,
         ownerName,
         businessName,
         category,

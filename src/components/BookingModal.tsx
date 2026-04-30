@@ -46,7 +46,7 @@ export function BookingModal({
       saveDemoBooking({
         providerId: provider.id,
         providerOwnerUid: provider.ownerUid,
-        clientUid: u?.uid ?? user.uid,
+        clientUid: u?.uid ?? user.id,
         clientPhone: u?.phone ?? user.phone,
         eventDate,
         location,

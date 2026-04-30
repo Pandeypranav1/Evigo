@@ -32,7 +32,7 @@ export default function ProviderDashboard() {
     const loadData = () => {
       const allBookings = getDemoBookings();
       const allProviders = getDemoProviders();
-      const mine = allProviders.filter((p) => p.ownerUid === user.uid);
+      const mine = allProviders.filter((p) => p.ownerUid === user.id);
       const myIds = new Set(mine.map((p) => p.id));
       const myBookings = allBookings.filter((b) => myIds.has(b.providerId));
       setMyListings(mine);

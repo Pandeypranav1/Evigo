@@ -28,7 +28,7 @@ export default function ClientDashboard() {
 
     const loadData = () => {
       const all = getDemoBookings();
-      const mine = all.filter((b) => b.clientUid === user.uid);
+      const mine = all.filter((b) => b.clientUid === user.id);
       setBookings(mine);
     };
 

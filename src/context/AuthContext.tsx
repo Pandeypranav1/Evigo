@@ -1,44 +1,50 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import {
-  type DemoUser,
-  type UserRole,
-  getDemoUser,
-  setDemoUser,
-  clearDemoUser,
-} from "@/lib/demoStore";
+
+export type UserRole = "client" | "provider";
+
+export type UserSession = {
+  id: string;
+  phone: string;
+  role: UserRole;
+  profileImage?: string;
+  createdAt?: string;
+};
 
 type AuthState = {
-  user: DemoUser | null;
+  user: UserSession | null;
   role: UserRole | null;
   loading: boolean;
-  loginAsDemo: (phone: string, role: UserRole) => void;
+  login: (user: UserSession) => void;
   signOut: () => void;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<DemoUser | null>(null);
+  const [user, setUser] = useState<UserSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Hydrate from localStorage on mount
-    const stored = getDemoUser();
-    setUser(stored);
+    try {
+      const stored = localStorage.getItem("evigo_user");
+      if (stored) {
+        setUser(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error("Failed to parse user session", e);
+    }
     setLoading(false);
   }, []);
 
-  const loginAsDemo = useCallback((phone: string, role: UserRole) => {
-    const uid = `demo_${phone.replace(/\D/g, "")}_${role}`;
-    const u: DemoUser = { uid, phone, role };
-    setDemoUser(u);
+  const login = useCallback((u: UserSession) => {
+    localStorage.setItem("evigo_user", JSON.stringify(u));
     setUser(u);
   }, []);
 
   const signOut = useCallback(() => {
-    clearDemoUser();
+    localStorage.removeItem("evigo_user");
     setUser(null);
   }, []);
 
@@ -47,10 +53,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       role: user?.role ?? null,
       loading,
-      loginAsDemo,
+      login,
       signOut,
     }),
-    [user, loading, loginAsDemo, signOut]
+    [user, loading, login, signOut]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

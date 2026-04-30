@@ -1,11 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Container } from "@/components/Container";
-import { useAuth } from "@/context/AuthContext";
-import type { UserRole } from "@/lib/demoStore";
-import { checkOrSetDemoPassword, resetDemoPassword } from "@/lib/demoStore";
+import { useAuth, UserRole } from "@/context/AuthContext";
 
 function normalizePhone(raw: string) {
   const v = raw.replace(/\s+/g, "");
@@ -22,23 +20,24 @@ function isValidPhone(v: string) {
 export default function LoginPage() {
   const params = useParams<{ role: string }>();
   const router = useRouter();
-  const { loginAsDemo } = useAuth();
+  const { login } = useAuth();
 
   const role = useMemo<UserRole>(
     () => (params.role === "provider" ? "provider" : "client"),
     [params.role]
   );
 
-  const [step, setStep] = useState<"phone" | "otp" | "reset">("phone");
+  const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const isProvider = role === "provider";
 
-  const sendOtp = () => {
+  const handleSendOtp = async () => {
     setError(null);
     const p = normalizePhone(phone);
     if (!isValidPhone(p) && !isValidPhone(phone)) {
@@ -46,49 +45,72 @@ export default function LoginPage() {
       return;
     }
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: p }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send OTP");
+      
       setStep("otp");
-      setNotice(`Account found or new. Please enter a password.`);
-    }, 400);
+      setNotice("OTP sent successfully. (Demo mode: use 123456)");
+    } catch (err: any) {
+      // Fallback safety
+      setStep("otp");
+      setNotice("Network issue: Fallback demo mode active. Use 123456.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const verifyOtp = () => {
+  const handleVerifyOtp = async () => {
     setError(null);
-    if (password.trim().length < 4) {
-      setError("Password must be at least 4 characters.");
+    const otpValue = otp.join("");
+    if (otpValue.length < 6) {
+      setError("Please enter the complete 6-digit OTP.");
       return;
     }
     const p = normalizePhone(phone) || phone;
-    const isValid = checkOrSetDemoPassword(p, password.trim());
-    if (!isValid) {
-      setError("Incorrect password for this number.");
-      return;
-    }
     setSubmitting(true);
-    setTimeout(() => {
-      loginAsDemo(p, role);
-      router.replace(role === "provider" ? "/provider/dashboard" : "/dashboard");
-    }, 700);
+    try {
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: p, otp: otpValue, role }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Invalid OTP");
+      
+      setNotice("Login successful!");
+      login(data.user);
+      setTimeout(() => {
+        router.replace(role === "provider" ? "/provider/dashboard" : "/dashboard");
+      }, 800);
+    } catch (err: any) {
+      setError(err.message);
+      setSubmitting(false);
+    }
   };
 
-  const handleResetPassword = () => {
-    setError(null);
-    if (password.trim().length < 4) {
-      setError("Password must be at least 4 characters.");
-      return;
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value.substring(value.length - 1);
+    setOtp(newOtp);
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
     }
-    const p = normalizePhone(phone) || phone;
-    const success = resetDemoPassword(p, password.trim());
-    if (success) {
-      setNotice("Password reset successfully. Logging in...");
-      setSubmitting(true);
-      setTimeout(() => {
-        loginAsDemo(p, role);
-        router.replace(role === "provider" ? "/provider/dashboard" : "/dashboard");
-      }, 700);
-    } else {
-      setError("Could not reset password. Account not found.");
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+    if (e.key === "Enter") {
+      if (!submitting) handleVerifyOtp();
     }
   };
 
@@ -106,6 +128,20 @@ export default function LoginPage() {
     boxSizing: "border-box",
   };
 
+  // OTP box style
+  const otpBoxStyle: React.CSSProperties = {
+    width: "48px",
+    height: "56px",
+    background: "#1a1a1a",
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 12,
+    color: "#ffffff",
+    fontSize: 24,
+    fontWeight: 700,
+    textAlign: "center",
+    outline: "none",
+  };
+
   return (
     <main
       className="flex-1 flex items-center justify-center py-12 min-h-[80vh]"
@@ -113,7 +149,6 @@ export default function LoginPage() {
         background: "linear-gradient(135deg, #0d0d0d 0%, #12052a 50%, #050d1a 100%)",
       }}
     >
-      {/* Ambient glow blobs */}
       <div
         aria-hidden
         style={{
@@ -186,25 +221,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Demo Mode Banner */}
-          <div
-            style={{
-              background: "rgba(251,191,36,0.08)",
-              border: "1px solid rgba(251,191,36,0.25)",
-              borderRadius: 12,
-              padding: "10px 16px",
-              marginBottom: 20,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span style={{ fontSize: 16 }}>🔐</span>
-            <span style={{ color: "#fde68a", fontSize: 13, fontWeight: 600 }}>
-              Demo Mode — Login with your password, or set a new one.
-            </span>
-          </div>
-
           {/* Glass Card */}
           <div
             style={{
@@ -217,7 +233,6 @@ export default function LoginPage() {
               boxShadow: "0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
             }}
           >
-            {/* Role badge */}
             <div
               style={{
                 display: "inline-flex",
@@ -262,10 +277,10 @@ export default function LoginPage() {
                     id="login-phone-input"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && !submitting && sendOtp()}
+                    onKeyDown={(e) => e.key === "Enter" && !submitting && handleSendOtp()}
                     placeholder="+91 XXXXX XXXXX"
                     type="tel"
-                    style={inputStyle}
+                    style={{ ...inputStyle, color: "#ffffff" }}
                     onFocus={(e) => {
                       e.currentTarget.style.borderColor = "rgba(139,92,246,0.6)";
                       e.currentTarget.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.1)";
@@ -296,7 +311,7 @@ export default function LoginPage() {
 
                 <button
                   id="login-send-otp-btn"
-                  onClick={sendOtp}
+                  onClick={handleSendOtp}
                   disabled={submitting}
                   style={{
                     width: "100%",
@@ -330,18 +345,14 @@ export default function LoginPage() {
                           animation: "spin 0.7s linear infinite",
                         }}
                       />
-                      Verifying…
+                      Sending OTP…
                     </>
                   ) : (
-                    "Continue →"
+                    "Send OTP →"
                   )}
                 </button>
-
-                <p style={{ textAlign: "center", fontSize: 12, color: "#6b7280" }}>
-                  🔒 Demo Mode — no real SMS sent
-                </p>
               </div>
-            ) : step === "otp" ? (
+            ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {notice && (
                   <div
@@ -370,57 +381,35 @@ export default function LoginPage() {
                       marginBottom: 8,
                       letterSpacing: "0.05em",
                       textTransform: "uppercase",
+                      textAlign: "center"
                     }}
                   >
-                    Enter Password
+                    Enter 6-digit OTP
                   </label>
-                  <input
-                    id="login-otp-input"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && !submitting && verifyOtp()}
-                    placeholder="••••••••"
-                    style={{
-                      ...inputStyle,
-                      fontSize: 24,
-                      fontWeight: 700,
-                      letterSpacing: "0.2em",
-                      textAlign: "center",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(6,182,212,0.6)";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(6,182,212,0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, alignItems: "center" }}>
-                    <p style={{ fontSize: 12, color: "#9ca3af" }}>
-                      New number? We will set this as your password.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStep("reset");
-                        setPassword("");
-                        setError(null);
-                        setNotice("Enter a new password to reset your account.");
-                      }}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        color: "#a78bfa",
-                        fontSize: 12,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        textDecoration: "underline"
-                      }}
-                    >
-                      Forgot Password?
-                    </button>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                    {otp.map((digit, index) => (
+                      <input
+                        key={index}
+                        ref={(el) => { inputRefs.current[index] = el; }}
+                        id={`otp-input-${index}`}
+                        type="text"
+                        value={digit}
+                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                        style={{
+                          ...otpBoxStyle,
+                          color: "#ffffff"
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = "rgba(6,182,212,0.6)";
+                          e.currentTarget.style.boxShadow = "0 0 0 3px rgba(6,182,212,0.1)";
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+                          e.currentTarget.style.boxShadow = "none";
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
 
@@ -443,7 +432,7 @@ export default function LoginPage() {
 
                 <button
                   id="login-verify-otp-btn"
-                  onClick={verifyOtp}
+                  onClick={handleVerifyOtp}
                   disabled={submitting}
                   style={{
                     width: "100%",
@@ -485,11 +474,10 @@ export default function LoginPage() {
                 </button>
 
                 <button
-                  id="login-change-number-btn"
                   type="button"
                   onClick={() => {
                     setStep("phone");
-                    setPassword("");
+                    setOtp(["", "", "", "", "", ""]);
                     setNotice(null);
                     setError(null);
                   }}
@@ -508,132 +496,9 @@ export default function LoginPage() {
                   ← Change Number
                 </button>
               </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {notice && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      background: "rgba(59,130,246,0.1)",
-                      border: "1px solid rgba(59,130,246,0.25)",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                    }}
-                  >
-                    <span style={{ fontSize: 16 }}>ℹ️</span>
-                    <span style={{ color: "#93c5fd", fontSize: 13, fontWeight: 600 }}>{notice}</span>
-                  </div>
-                )}
-
-                <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: "#d1d5db",
-                      marginBottom: 8,
-                      letterSpacing: "0.05em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && !submitting && handleResetPassword()}
-                    placeholder="••••••••"
-                    style={{
-                      ...inputStyle,
-                      fontSize: 24,
-                      fontWeight: 700,
-                      letterSpacing: "0.2em",
-                      textAlign: "center",
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(139,92,246,0.6)";
-                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  />
-                </div>
-
-                {error && (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      background: "rgba(239,68,68,0.1)",
-                      border: "1px solid rgba(239,68,68,0.25)",
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                    }}
-                  >
-                    <span style={{ fontSize: 16 }}>⚠️</span>
-                    <span style={{ color: "#fca5a5", fontSize: 13, fontWeight: 600 }}>{error}</span>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleResetPassword}
-                  disabled={submitting}
-                  style={{
-                    width: "100%",
-                    padding: "13px 20px",
-                    borderRadius: 12,
-                    border: "none",
-                    background: submitting
-                      ? "rgba(139,92,246,0.4)"
-                      : "linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)",
-                    color: "#ffffff",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    cursor: submitting ? "not-allowed" : "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8,
-                    boxShadow: submitting ? "none" : "0 4px 20px rgba(139,92,246,0.35)",
-                  }}
-                >
-                  {submitting ? "Resetting..." : "Reset Password ✓"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep("otp");
-                    setPassword("");
-                    setNotice(null);
-                    setError(null);
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 16px",
-                    borderRadius: 12,
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    background: "rgba(255,255,255,0.05)",
-                    color: "#d1d5db",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  ← Back to Login
-                </button>
-              </div>
             )}
           </div>
 
-          {/* Switch role link */}
           <p style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#6b7280" }}>
             {isProvider ? (
               <>
