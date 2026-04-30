@@ -62,9 +62,9 @@ export function Footer() {
       {/* Main Footer Content */}
       <div
         style={{
-          maxWidth: 1280,
+          maxWidth: 1440,
           margin: "0 auto",
-          padding: "56px 16px 32px",
+          padding: "56px 24px 32px",
           boxSizing: "border-box" as const,
         }}
       >

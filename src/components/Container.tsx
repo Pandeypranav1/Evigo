@@ -5,10 +5,10 @@ export function Container({ children }: { children: ReactNode }) {
     <div
       style={{
         width: "100%",
-        maxWidth: 1280,
+        maxWidth: 1440,
         margin: "0 auto",
-        paddingLeft: 16,
-        paddingRight: 16,
+        paddingLeft: 24,
+        paddingRight: 24,
         boxSizing: "border-box",
       }}
     >

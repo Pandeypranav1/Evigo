@@ -111,7 +111,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-[#05030f]/70 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] before:absolute before:inset-0 before:-z-10 before:bg-gradient-to-r before:from-violet-500/10 before:via-transparent before:to-cyan-500/10">
-        <div className="mx-auto flex h-20 max-w-[1200px] items-center justify-between px-5 sm:px-6">
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-6">
           {/* Logo */}
           <Link href="/" className="group flex items-center gap-2" onClick={() => setMenuOpen(false)}>
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
