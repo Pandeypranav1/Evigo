@@ -25,11 +25,7 @@ export async function POST(request: Request) {
 
     const normalizedPhone = `+91${tenDigits}`;
 
-    // Demo Mode Check
-    const isRealMode = !!process.env.TWILIO_ACCOUNT_SID;
-    if (!isRealMode) {
-      console.log(`[DEMO MODE] Allowing number: ${tenDigits}`);
-    }
+    console.log(`[DEMO MODE] Allowing number: ${tenDigits}`);
 
     // Rate Limit (1 per 30s per number)
     const lastSent = rateLimit.get(normalizedPhone);
@@ -38,8 +34,8 @@ export async function POST(request: Request) {
     }
     rateLimit.set(normalizedPhone, Date.now());
 
-    // Generate static OTP for demo mode, or random 6 digits for real mode
-    const otp = !isRealMode ? "123456" : Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate static OTP for demo mode
+    const otp = "123456";
 
     await sendOTP(normalizedPhone, otp);
 

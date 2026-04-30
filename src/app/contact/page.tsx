@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+
 
 export const metadata = {
   title: "Contact Us - Evigo",
@@ -11,7 +10,7 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#05030f] text-white selection:bg-violet-500/30 relative">
-      <Header />
+
       
       {/* Background gradients */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
@@ -75,7 +74,7 @@ export default function ContactPage() {
         </div>
       </main>
 
-      <Footer />
+
     </div>
   );
 }
