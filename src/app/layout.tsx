@@ -20,6 +20,7 @@ export const viewport: Viewport = {
   themeColor: "#8b5cf6",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
 };
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s | Evigo",
   },
   description:
-    "Book trusted event service providers in minutes — Catering, Photography, DJ, Mehendi & Makeup, and Cultural services across Bihar. No fake vendors, real-time bookings.",
+    "Book trusted event service providers in minutes — Catering, Photography, DJ, Mehendi & Makeup, and Restaurant/Hotel services across Bihar. No fake vendors, real-time bookings.",
   keywords: [
     "Evigo",
     "event services Bihar",
@@ -54,7 +55,7 @@ export const metadata: Metadata = {
     siteName: "Evigo",
     title: "Evigo — Real-time Event Services in Bihar",
     description:
-      "Book trusted event service providers in minutes. Catering, Photography, DJ, Mehendi & Makeup, Cultural services.",
+      "Book trusted event service providers in minutes. Catering, Photography, DJ, Mehendi & Makeup, Restaurant & Hotel services.",
   },
   twitter: {
     card: "summary_large_image",

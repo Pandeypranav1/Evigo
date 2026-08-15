@@ -27,7 +27,7 @@ const ProviderSchema = new Schema<IProvider>(
     ownerUid:       { type: String },
     businessName:   { type: String, required: true, trim: true },
     ownerName:      { type: String, required: true, trim: true },
-    category:       { type: String, required: true, enum: ["Catering", "Photography", "DJ", "Mehendi & Makeup", "Cultural"] },
+    category:       { type: String, required: true, enum: ["Catering", "Photography", "DJ", "Mehendi & Makeup", "Restaurant", "Cultural"] },
     startingPrice:  { type: Number, required: true, min: 0 },
     city:           { type: String, required: true, trim: true },
     phone:          { type: String, default: "" },

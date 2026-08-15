@@ -112,7 +112,7 @@ export function clearDemoUser() {
 }
 
 // ─────────────────────────── PROVIDERS ──────────────────────────
-const PROVIDERS_KEY = "evigo_demo_providers";
+const PROVIDERS_KEY = "evigo_demo_providers_v2";
 
 export function getDemoProviders(): DemoProvider[] {
   if (typeof window === "undefined") return [];
@@ -144,7 +144,7 @@ export function deleteDemoProvider(id: string) {
 }
 
 // ─────────────────────────── BOOKINGS ───────────────────────────
-const BOOKINGS_KEY = "evigo_demo_bookings";
+const BOOKINGS_KEY = "evigo_demo_bookings_v2";
 
 export function getDemoBookings(): DemoBooking[] {
   if (typeof window === "undefined") return [];

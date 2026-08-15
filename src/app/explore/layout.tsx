@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Explore Providers",
   description:
-    "Browse verified event service providers across Bihar — Catering, Photography, DJ, Mehendi & Makeup, and Cultural services. Real listings, no fake vendors.",
+    "Browse verified event service providers across Bihar — Catering, Photography, DJ, Mehendi & Makeup, and Restaurant/Hotel services. Real listings, no fake vendors.",
 };
 
 export default function ExploreLayout({

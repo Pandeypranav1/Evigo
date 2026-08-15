@@ -81,6 +81,8 @@ function AvatarDropdown({ user, role, onSignOut }: { user: any, role: string | n
   );
 }
 
+import { PageContainer } from "@/components/PageContainer";
+
 export function Header() {
   const { user, role, signOut } = useAuth();
   const router = useRouter();
@@ -111,7 +113,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-[#05030f]/70 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] before:absolute before:inset-0 before:-z-10 before:bg-gradient-to-r before:from-violet-500/10 before:via-transparent before:to-cyan-500/10">
-        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-6">
+        <PageContainer className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="group flex items-center gap-2" onClick={() => setMenuOpen(false)}>
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
@@ -126,6 +128,7 @@ export function Header() {
           <nav className="hidden md:flex items-center gap-6 bg-white/[0.03] px-8 py-2.5 rounded-full border border-white/5 shadow-inner">
             <NavLink href="/explore">Explore</NavLink>
             <NavLink href="/services">Services</NavLink>
+            <NavLink href="/#travel-tourism">Travel & Tourism</NavLink>
             <NavLink href="/about">About</NavLink>
             <NavLink href="/contact">Contact</NavLink>
           </nav>
@@ -170,7 +173,7 @@ export function Header() {
             <span className={`block h-0.5 w-5 rounded-full bg-white transition-opacity duration-300 ${menuOpen ? 'opacity-0' : 'opacity-100'}`} />
             <span className={`block h-0.5 w-5 rounded-full bg-white transition-transform duration-300 ${menuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
           </button>
-        </div>
+        </PageContainer>
       </header>
 
       {/* Mobile Menu Overlay */}
@@ -212,6 +215,10 @@ export function Header() {
             </Link>
             <Link href="/services" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
               All Services
+              <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </Link>
+            <Link href="/#travel-tourism" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>
+              Travel & Tourism
               <svg className="h-5 w-5 text-white/20 transition-transform group-hover:translate-x-1 group-hover:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </Link>
             <Link href="/about" className="group flex items-center justify-between text-lg font-bold text-white/80 py-4 border-b border-white/5 hover:text-white transition-colors" onClick={() => setMenuOpen(false)}>

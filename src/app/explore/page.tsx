@@ -4,21 +4,29 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/Container";
-import { SERVICE_CATEGORIES, CATEGORY_IMAGE } from "@/lib/constants";
-import type { ServiceCategory } from "@/lib/constants";
+import { SERVICE_CATEGORIES, CATEGORY_IMAGE, EVENT_VENUES } from "@/lib/constants";
+import type { ServiceCategory, EventVenue } from "@/lib/constants";
 import type { DemoProvider } from "@/lib/demoStore";
 import { getDemoProviders, getDemoUser, saveDemoBooking } from "@/lib/demoStore";
 
-/* ─── tiny helpers ─── */
+/* ─── Price bands ─── */
 const PRICE_BANDS = [
-  { label: "Any Price", min: 0, max: Infinity },
-  { label: "Under ₹5,000", min: 0, max: 5000 },
-  { label: "₹5k – ₹15k", min: 5000, max: 15000 },
-  { label: "₹15k – ₹50k", min: 15000, max: 50000 },
-  { label: "₹50k+", min: 50000, max: Infinity },
+  { label: "Any Price",      min: 0,     max: Infinity },
+  { label: "Under ₹5,000",  min: 0,     max: 5000 },
+  { label: "₹5k – ₹15k",   min: 5000,  max: 15000 },
+  { label: "₹15k – ₹50k",  min: 15000, max: 50000 },
+  { label: "₹50k+",         min: 50000, max: Infinity },
 ];
 
-/* ─── Booking Modal ─── */
+/* ─── Hotel-venue price parser (lowest price from range) ─── */
+function parseLowestPrice(range?: string): number {
+  if (!range) return 1500;
+  // e.g. "₹800–₹2,500/night" → 800
+  const match = range.replace(/[₹,]/g, "").match(/^(\d+)/);
+  return match ? parseInt(match[1]) : 1500;
+}
+
+/* ─── Booking Modal (for DemoProviders) ─── */
 function BookingModal({
   provider,
   onClose,
@@ -100,30 +108,23 @@ function BookingModal({
   );
 }
 
-/* ─── Provider Card ─── */
+/* ─── Provider Card (DemoProvider) ─── */
 function ProviderCard({ provider, onBook }: { provider: DemoProvider; onBook: (p: DemoProvider) => void }) {
   const [imgError, setImgError] = useState(false);
-  const imgSrc = provider.imageUrl && !imgError ? provider.imageUrl : CATEGORY_IMAGE[provider.category];
+  const imgSrc = provider.imageUrl && !imgError ? provider.imageUrl : CATEGORY_IMAGE[provider.category as keyof typeof CATEGORY_IMAGE] ?? "/evigo-hero.png";
 
   return (
-    <div
-      className="bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_48px_rgba(139,92,246,0.15)] hover:border-purple-300"
-    >
-      {/* Image */}
+    <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_48px_rgba(139,92,246,0.15)] hover:border-purple-300">
       <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100">
         <Image src={imgSrc} alt={provider.businessName} fill className="object-cover transition-transform duration-500 hover:scale-105"
           sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
           onError={() => setImgError(true)}
         />
-        {/* gradient */}
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)" }} />
-        {/* category pill */}
         <div className="absolute top-3 left-3">
           <span className="bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-[11px] font-bold text-zinc-600">{provider.category}</span>
         </div>
       </div>
-
-      {/* Body */}
       <div className="p-4">
         <div className="text-[15px] font-black text-zinc-900">{provider.businessName}</div>
         <div className="text-xs font-semibold text-zinc-500 mt-0.5">{provider.ownerName}</div>
@@ -145,6 +146,107 @@ function ProviderCard({ provider, onBook }: { provider: DemoProvider; onBook: (p
           </button>
           {provider.phone && (
             <a href={`tel:${provider.phone}`} className="flex-1 py-2.5 rounded-xl border border-zinc-200 bg-white text-[13px] font-bold text-zinc-600 no-underline text-center transition-colors hover:bg-zinc-50">
+              📞 Call
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Hotel Venue Card ─── */
+function HotelVenueCard({ venue }: { venue: EventVenue }) {
+  const [imgIdx, setImgIdx] = useState(0);
+  const [imgError, setImgError] = useState(false);
+  const imgSrc = imgError ? "/evigo-hero.png" : venue.images[imgIdx];
+
+  return (
+    <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_48px_rgba(6,182,212,0.15)] hover:border-cyan-300">
+      {/* Image with carousel dots */}
+      <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100">
+        <Image
+          src={imgSrc}
+          alt={venue.name}
+          fill
+          className="object-cover transition-all duration-500"
+          sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          onError={() => setImgError(true)}
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 55%)" }} />
+        {/* Category badge */}
+        <div className="absolute top-3 left-3 flex gap-1.5">
+          <span className="bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-[11px] font-bold text-zinc-600">🏨 Restaurant</span>
+          <span className="bg-cyan-500/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-[11px] font-bold text-white">✓ Verified</span>
+        </div>
+        {/* Rating */}
+        <div className="absolute top-3 right-3">
+          <span className="bg-amber-400/95 rounded-full px-2 py-0.5 text-[11px] font-black text-zinc-900">
+            ★ {venue.googleRating?.toFixed(1)}
+          </span>
+        </div>
+        {/* Image carousel dots */}
+        {venue.images.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {venue.images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setImgIdx(i)}
+                className="rounded-full transition-all duration-200 cursor-pointer border-none"
+                style={{
+                  width: i === imgIdx ? 18 : 6,
+                  height: 6,
+                  background: i === imgIdx ? "#fff" : "rgba(255,255,255,0.5)",
+                }}
+              />
+            ))}
+          </div>
+        )}
+        {/* Arrow nav */}
+        <button
+          className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white flex items-center justify-center text-sm cursor-pointer border-none hover:bg-black/60 transition"
+          onClick={() => setImgIdx((imgIdx - 1 + venue.images.length) % venue.images.length)}
+        >‹</button>
+        <button
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 text-white flex items-center justify-center text-sm cursor-pointer border-none hover:bg-black/60 transition"
+          onClick={() => setImgIdx((imgIdx + 1) % venue.images.length)}
+        >›</button>
+      </div>
+
+      {/* Body */}
+      <div className="p-4">
+        <div className="text-[15px] font-black text-zinc-900">{venue.name}</div>
+        <div className="text-xs text-zinc-500 mt-0.5">
+          📍 {venue.location} · {venue.reviewCount} reviews
+        </div>
+        {venue.description && (
+          <div className="mt-2 text-xs text-zinc-500 leading-relaxed line-clamp-2">{venue.description}</div>
+        )}
+        {/* Safety badges */}
+        <div className="flex flex-wrap gap-1.5 mt-2.5">
+          {venue.safetyFeatures.slice(0, 2).map(f => (
+            <span key={f} className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              ✓ {f}
+            </span>
+          ))}
+        </div>
+        {/* Price */}
+        {venue.priceRange && (
+          <div className="mt-2 text-[13px] font-black" style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            {venue.priceRange}
+          </div>
+        )}
+        {/* Actions */}
+        <div className="flex gap-2 mt-3.5">
+          <Link
+            href={`/hotels#${venue.id}`}
+            className="flex-1 py-2.5 rounded-xl text-[13px] font-bold text-white no-underline text-center cursor-pointer transition-opacity hover:opacity-90"
+            style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", boxShadow: "0 2px 10px rgba(139,92,246,0.3)" }}
+          >
+            Explore →
+          </Link>
+          {venue.phone && (
+            <a href={`tel:${venue.phone}`} className="flex-1 py-2.5 rounded-xl border border-zinc-200 bg-white text-[13px] font-bold text-zinc-600 no-underline text-center transition-colors hover:bg-zinc-50">
               📞 Call
             </a>
           )}
@@ -191,15 +293,34 @@ export default function ExplorePage() {
     return () => window.removeEventListener("storage", load);
   }, []);
 
-  const filtered = useMemo(() => {
+  /* ─── Filter DemoProviders ─── */
+  const filteredProviders = useMemo(() => {
     const band = PRICE_BANDS[priceBand];
     return providers.filter(p => {
-      if (category !== "All" && p.category !== category) return false;
+      if (category !== "All" && category !== "Restaurant" && p.category !== category) return false;
+      if (category === "Restaurant") return false; // Hotels handle Restaurant tab
       if (locationFilter && !p.city.toLowerCase().includes(locationFilter.toLowerCase())) return false;
       if (p.startingPrice < band.min || p.startingPrice >= band.max) return false;
       return true;
     });
   }, [providers, category, locationFilter, priceBand]);
+
+  /* ─── Filter Hotels (EVENT_VENUES) ─── */
+  const filteredHotels = useMemo(() => {
+    const showHotels = category === "All" || category === "Restaurant";
+    if (!showHotels) return [];
+    const band = PRICE_BANDS[priceBand];
+    return EVENT_VENUES.filter(h => {
+      if (locationFilter && !h.location.toLowerCase().includes(locationFilter.toLowerCase()) && !h.city.toLowerCase().includes(locationFilter.toLowerCase())) return false;
+      const lowestPrice = parseLowestPrice(h.priceRange);
+      // Hotels show in "Any Price" and "Under ₹5,000" bands (typical room rates)
+      if (band.min > 0 && lowestPrice < band.min) return false;
+      if (lowestPrice >= band.max) return false;
+      return true;
+    });
+  }, [category, locationFilter, priceBand]);
+
+  const totalResults = filteredProviders.length + filteredHotels.length;
 
   return (
     <main className="flex-1 pb-16 sm:pb-20">
@@ -216,7 +337,7 @@ export default function ExplorePage() {
               </span>
             </h1>
             <p className="text-sm sm:text-[15px] text-zinc-500 mt-3 max-w-md mx-auto leading-relaxed">
-              Browse verified event professionals across Bihar. Real people, real services.
+              Browse verified event professionals and hotel partners across Bihar. Real people, real services.
             </p>
           </div>
         </Container>
@@ -238,8 +359,12 @@ export default function ExplorePage() {
           {/* Location */}
           <div className="flex flex-col gap-1 flex-1 min-w-[130px]">
             <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">Location</label>
-            <input value={locationFilter} onChange={e => setLocationFilter(e.target.value)} placeholder="City, e.g. Patna"
-              className="px-3 py-2 rounded-xl border border-zinc-200 text-[13px] font-semibold text-zinc-900 outline-none bg-zinc-50" />
+            <input
+              value={locationFilter}
+              onChange={e => setLocationFilter(e.target.value)}
+              placeholder="City or district, e.g. Jamui"
+              className="px-3 py-2 rounded-xl border border-zinc-200 text-[13px] font-semibold text-zinc-900 outline-none bg-zinc-50"
+            />
           </div>
 
           {/* Price */}
@@ -253,7 +378,7 @@ export default function ExplorePage() {
 
           {/* Result count */}
           <div className="text-[13px] font-bold text-zinc-500 whitespace-nowrap ml-auto">
-            {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+            {totalResults} result{totalResults !== 1 ? "s" : ""}
           </div>
         </div>
 
@@ -265,22 +390,48 @@ export default function ExplorePage() {
               <button key={c} onClick={() => setCategory(c as ServiceCategory | "All")}
                 className="px-4 py-1.5 rounded-full text-[13px] font-bold cursor-pointer transition-all duration-200"
                 style={{ border: active ? "none" : "1px solid #e4e4e7", background: active ? "linear-gradient(135deg,#8b5cf6,#06b6d4)" : "#fff", color: active ? "#fff" : "#52525b", boxShadow: active ? "0 2px 10px rgba(139,92,246,0.3)" : "none" }}>
-                {c}
+                {c === "Restaurant" ? "🏨 Restaurant" : c}
               </button>
             );
           })}
         </div>
 
-        {/* ── Grid or Empty ── */}
-        {filtered.length === 0 ? (
-          <EmptyState category={category} />
-        ) : (
-          <div className="evigo-explore-grid">
-            {filtered.map(p => (
-              <ProviderCard key={p.id} provider={p} onBook={setSelectedProvider} />
-            ))}
-          </div>
+        {/* ── Results: Hotel Venue Cards (when All or Restaurant selected) ── */}
+        {filteredHotels.length > 0 && (
+          <>
+            {category === "All" && (
+              <div className="mb-4 flex items-center gap-3">
+                <div className="text-xs font-black text-zinc-500 uppercase tracking-widest">Hotel & Restaurant Partners</div>
+                <div className="flex-1 h-px bg-zinc-100" />
+              </div>
+            )}
+            <div className="evigo-explore-grid mb-8">
+              {filteredHotels.map(h => (
+                <HotelVenueCard key={h.id} venue={h} />
+              ))}
+            </div>
+          </>
         )}
+
+        {/* ── Results: Provider Cards ── */}
+        {filteredProviders.length > 0 && (
+          <>
+            {category === "All" && filteredHotels.length > 0 && (
+              <div className="mb-4 flex items-center gap-3">
+                <div className="text-xs font-black text-zinc-500 uppercase tracking-widest">Service Providers</div>
+                <div className="flex-1 h-px bg-zinc-100" />
+              </div>
+            )}
+            <div className="evigo-explore-grid">
+              {filteredProviders.map(p => (
+                <ProviderCard key={p.id} provider={p} onBook={setSelectedProvider} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ── Empty State ── */}
+        {totalResults === 0 && <EmptyState category={category} />}
       </Container>
 
       <BookingModal provider={selectedProvider} onClose={() => setSelectedProvider(null)} />
