@@ -288,7 +288,6 @@ export default function Home() {
                       aspectRatio: "3/4",
                       border: `1px solid ${accent}22`,
                       boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
-                      cursor: "pointer",
                       background: "#0f0a1e",
                     }}
                   >
@@ -306,26 +305,7 @@ export default function Home() {
                     >
                       <div className="text-white font-bold text-sm sm:text-base mb-0.5">{partner.name}</div>
                       <div className="text-gray-300 text-xs font-semibold mb-0.5">{partner.location}</div>
-                      <div className="text-gray-400 text-xs font-medium mb-3">{partner.description}</div>
-                      {/* CTA buttons */}
-                      <div className="flex gap-2">
-                        <Link
-                          href="/hotels"
-                          className="flex-1 py-2 rounded-xl text-[12px] font-black text-white text-center no-underline transition-opacity hover:opacity-90"
-                          style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", boxShadow: "0 2px 10px rgba(139,92,246,0.4)" }}
-                          onClick={e => e.stopPropagation()}
-                        >
-                          Explore →
-                        </Link>
-                        <a
-                          href="tel:+919876500001"
-                          className="flex-1 py-2 rounded-xl text-[12px] font-black text-white text-center no-underline transition-colors"
-                          style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.25)" }}
-                          onClick={e => e.stopPropagation()}
-                        >
-                          📞 Call
-                        </a>
-                      </div>
+                      <div className="text-gray-400 text-xs font-medium">{partner.description}</div>
                     </div>
                     <div
                       className="absolute top-0 left-0 right-0 h-[3px]"

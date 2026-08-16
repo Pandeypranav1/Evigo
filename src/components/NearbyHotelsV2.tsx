@@ -11,7 +11,7 @@
  *   3. Displays verified partners within radius on Leaflet map + card grid.
  */
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
@@ -330,10 +330,8 @@ export function NearbyHotelsV2() {
     );
   }, [runSearch, radiusKm]);
 
-  // Run initial search for Jamui on mount so user sees instant results
-  useEffect(() => {
-    executeCitySearch("Jamui", 15);
-  }, [executeCitySearch]);
+  // handleReset resets back to idle — no auto-search on mount so the map
+  // and result cards only appear after the user actively triggers a search.
 
   const handleReset = useCallback(() => {
     setStatus("idle");
@@ -511,7 +509,36 @@ export function NearbyHotelsV2() {
           )}
         </div>
 
-        {/* Results view */}
+        {/* Idle prompt — shown before any search has been performed */}
+        {status === "idle" && (
+          <div className="flex flex-col items-center justify-center gap-4 py-14 px-6 rounded-2xl text-center"
+            style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.12)" }}
+          >
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+              style={{ background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.2)" }}
+            >
+              🗺️
+            </div>
+            <div>
+              <p className="text-white font-bold text-base mb-1">Find Verified Hotels Near You</p>
+              <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
+                Select a city or use your GPS location to discover verified partner hotels nearby.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setCityInput("Jamui");
+                executeCitySearch("Jamui");
+              }}
+              className="px-5 py-2.5 rounded-xl text-xs font-bold text-white border-none cursor-pointer transition-all hover:opacity-90"
+              style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)", boxShadow: "0 2px 12px rgba(139,92,246,0.3)" }}
+            >
+              🎯 Quick Start: Show Jamui Hotels
+            </button>
+          </div>
+        )}
+
+        {/* Results view — only shown after a successful search */}
         {status === "success" && originCoords && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10">
